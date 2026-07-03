@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>打字侠</title>
+  <style>
+    :root {
+      --ink: #6d7176;
+      --muted: #92979d;
+      --line: #cfd4df;
+      --blue: #6fa7f2;
+      --blue-dark: #3575de;
+      --paper: #fbfcfe;
+      --key: #ffffff;
+      --good: #56b786;
+      --bad: #df6464;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      color: var(--ink);
+      background: linear-gradient(#f8fafc 0 66%, #f1f3f6 66% 100%);
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      user-select: none;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 44px minmax(250px, 36vh) 1fr;
+    }
+
+    .titlebar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px;
+      background: #eef3f9;
+      color: #24282d;
+      border-bottom: 1px solid #e5e9ef;
+      font-size: 18px;
+    }
+
+    .article-tools {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .article-tools select,
+    .article-tools button,
+    .editor input,
+    .editor textarea {
+      border: 1px solid #c7ccd4;
+      border-radius: 6px;
+      background: #fff;
+      color: #4f5965;
+      font: inherit;
+    }
+
+    .article-tools select {
+      width: 210px;
+      height: 30px;
+      padding: 0 8px;
+    }
+
+    .article-tools button,
+    .editor-actions button {
+      height: 30px;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    .article-tools button.primary,
+    .editor-actions button.primary {
+      border-color: #5c94de;
+      background: #6fa7f2;
+      color: #fff;
+    }
+
+    .logo {
+      width: 23px;
+      height: 23px;
+      display: grid;
+      place-items: center;
+      background: #ffc43c;
+      border-radius: 3px;
+      color: #252525;
+      font-weight: 800;
+      font-size: 15px;
+      transform: rotate(-4deg);
+      box-shadow: inset 0 -2px rgba(0, 0, 0, .08);
+    }
+
+    .lesson {
+      position: relative;
+      padding: 0 58px 18px;
+      background: var(--paper);
+      border-bottom: 3px solid #c6cbed;
+      overflow: hidden;
+    }
+
+    .lesson::after {
+      content: "";
+      position: absolute;
+      right: 6px;
+      top: 8px;
+      width: 13px;
+      height: calc(100% - 16px);
+      border-radius: 999px;
+      background: linear-gradient(#86898e 0 16px, transparent 16px 218px, #86898e 218px 100%);
+      opacity: .75;
+    }
+
+    .phrase {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 12px 4px;
+      padding-top: 8px;
+      max-width: 1100px;
+    }
+
+    .syllable {
+      min-width: 34px;
+      text-align: center;
+      transition: transform .12s ease, color .12s ease;
+    }
+
+    .syllable.punct {
+      min-width: 18px;
+      align-self: flex-end;
+    }
+
+    .syllable.active {
+      color: #43484e;
+      transform: translateY(-2px);
+    }
+
+    .pinyin {
+      display: block;
+      font-size: clamp(28px, 3.9vw, 56px);
+      line-height: 1.1;
+      letter-spacing: 2px;
+      white-space: nowrap;
+      color: #74777b;
+    }
+
+    .hanzi {
+      display: block;
+      margin-top: 10px;
+      font-family: "KaiTi", "STKaiti", "Microsoft YaHei", serif;
+      font-size: clamp(26px, 3vw, 44px);
+      line-height: 1.1;
+      color: #85888d;
+      letter-spacing: 0;
+    }
+
+    .article-text {
+      max-width: 1060px;
+      font-size: clamp(30px, 4vw, 56px);
+      line-height: 1.55;
+      letter-spacing: .5px;
+      color: #74777b;
+      white-space: pre-wrap;
+    }
+
+    .article-text .typed {
+      color: #a8adb4;
+    }
+
+    .article-text .current-char {
+      color: #3575de;
+      background: rgba(111, 167, 242, .16);
+      border-radius: 4px;
+    }
+
+    .syllable.done .pinyin,
+    .syllable.done .hanzi {
+      color: #a9adb3;
+    }
+
+    .caret-line {
+      position: absolute;
+      left: 0;
+      right: 24px;
+      bottom: 0;
+      height: 3px;
+      background: #c7cbed;
+    }
+
+    .caret-line::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: var(--progress, 0%);
+      height: 100%;
+      background: #5366d8;
+      transition: width .08s linear;
+    }
+
+    .trainer {
+      position: relative;
+      display: grid;
+      grid-template-rows: 48px auto 1fr;
+      justify-items: center;
+      padding-top: 18px;
+      overflow: hidden;
+    }
+
+    .hud {
+      width: min(984px, calc(100vw - 64px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #7b8087;
+      font-size: 16px;
+    }
+
+    .current {
+      font-size: 24px;
+      color: #4d5560;
+    }
+
+    .current strong {
+      color: var(--blue-dark);
+      font-size: 32px;
+      margin-left: 8px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 18px;
+      white-space: nowrap;
+    }
+
+    .keyboard {
+      position: relative;
+      width: min(984px, calc(100vw - 64px));
+      display: grid;
+      gap: 4px;
+      z-index: 2;
+    }
+
+    .row {
+      display: grid;
+      gap: 4px;
+      height: 62px;
+    }
+
+    .row.numbers {
+      grid-template-columns: repeat(13, 1fr) 1.55fr;
+    }
+
+    .row.top {
+      grid-template-columns: 1.55fr repeat(12, 1fr);
+    }
+
+    .row.home {
+      grid-template-columns: 1.85fr repeat(11, 1fr) 1.85fr;
+    }
+
+    .row.bottom {
+      grid-template-columns: 1.9fr repeat(10, 1fr) 2.3fr;
+    }
+
+    .row.space {
+      grid-template-columns: 1.9fr 1.9fr 4.5fr 1.9fr 3fr;
+      height: 74px;
+    }
+
+    .key {
+      position: relative;
+      min-width: 0;
+      display: grid;
+      place-items: center;
+      border: 1px solid #b9bdc3;
+      border-radius: 6px;
+      background: linear-gradient(#fff, #f7f8fa);
+      color: #66707b;
+      font-size: clamp(18px, 2.4vw, 36px);
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .04);
+      transition: transform .05s ease, background .08s ease, color .08s ease, border-color .08s ease;
+    }
+
+    .key.small {
+      font-size: 14px;
+      justify-items: start;
+      padding-left: 12px;
+    }
+
+    .key.dual {
+      line-height: 1;
+      gap: 3px;
+      font-size: 24px;
+    }
+
+    .key.dual span:last-child {
+      color: #63707e;
+    }
+
+    .key.next {
+      background: linear-gradient(#9ecbfb, #82b9f3);
+      border-color: #5c94de;
+      color: #fff;
+      box-shadow: 0 0 0 5px rgba(75, 133, 228, .25), inset 0 -2px 0 rgba(0, 0, 0, .08);
+    }
+
+    .key.pressed {
+      transform: translateY(2px);
+      background: linear-gradient(#d7eaff, #b7d7fb);
+    }
+
+    .key.wrong {
+      background: linear-gradient(#ffe3e3, #ffc9c9);
+      border-color: var(--bad);
+      color: #9b3434;
+    }
+
+    .hands {
+      position: absolute;
+      left: 50%;
+      top: 143px;
+      width: min(900px, calc(100vw - 110px));
+      height: 420px;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .finger {
+      position: absolute;
+      width: 68px;
+      height: 250px;
+      border: 5px solid rgba(116, 120, 124, .72);
+      border-bottom-color: transparent;
+      border-radius: 46px 46px 28px 28px;
+      transform-origin: 50% 0;
+      opacity: .88;
+      transition: border-color .12s ease, transform .12s ease, opacity .12s ease;
+    }
+
+    .finger.left.little { left: 70px; top: 92px; transform: rotate(16deg); }
+    .finger.left.ring { left: 142px; top: 85px; transform: rotate(13deg); }
+    .finger.left.middle { left: 222px; top: 82px; transform: rotate(10deg); }
+    .finger.left.index { left: 308px; top: 86px; transform: rotate(8deg); height: 300px; }
+    .finger.right.index { right: 308px; top: 86px; transform: rotate(-8deg); height: 300px; }
+    .finger.right.middle { right: 222px; top: 82px; transform: rotate(-10deg); }
+    .finger.right.ring { right: 142px; top: 85px; transform: rotate(-13deg); }
+    .finger.right.little { right: 70px; top: 92px; transform: rotate(-16deg); }
+
+    .thumb {
+      position: absolute;
+      top: 192px;
+      width: 126px;
+      height: 190px;
+      border: 5px solid rgba(116, 120, 124, .72);
+      border-top-color: transparent;
+      border-radius: 30px 30px 80px 80px;
+      opacity: .88;
+      transition: border-color .12s ease, transform .12s ease;
+    }
+
+    .thumb.left {
+      left: 352px;
+      transform: rotate(-20deg);
+    }
+
+    .thumb.right {
+      right: 352px;
+      transform: rotate(20deg);
+    }
+
+    .finger.active,
+    .thumb.active {
+      border-color: rgba(52, 112, 220, .92);
+      border-bottom-color: transparent;
+      opacity: 1;
+    }
+
+    .thumb.active {
+      border-top-color: transparent;
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%);
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .86);
+      color: #65707d;
+      border: 1px solid #d9dde5;
+      font-size: 15px;
+      box-shadow: 0 12px 30px rgba(46, 55, 70, .08);
+      z-index: 4;
+    }
+
+    .hidden-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .editor-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(31, 36, 45, .32);
+      z-index: 10;
+    }
+
+    .editor-backdrop.open {
+      display: grid;
+    }
+
+    .editor {
+      width: min(720px, calc(100vw - 40px));
+      padding: 18px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 24px 80px rgba(36, 43, 55, .24);
+      color: #4f5965;
+    }
+
+    .editor h2 {
+      margin: 0 0 12px;
+      color: #303741;
+      font-size: 20px;
+      font-weight: 650;
+    }
+
+    .editor label {
+      display: grid;
+      gap: 6px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    .editor input,
+    .editor textarea {
+      width: 100%;
+      padding: 9px 10px;
+      user-select: text;
+    }
+
+    .editor textarea {
+      min-height: 92px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .editor-help {
+      margin: 0;
+      color: #77808a;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .editor-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-rows: 42px minmax(220px, 34vh) 1fr;
+      }
+
+      .lesson {
+        padding-left: 22px;
+        padding-right: 28px;
+      }
+
+      .phrase {
+        gap: 10px 3px;
+      }
+
+      .hanzi {
+        letter-spacing: 0;
+      }
+
+      .article-tools {
+        gap: 5px;
+      }
+
+      .article-tools select {
+        width: 140px;
+      }
+
+      .hud,
+      .keyboard {
+        width: calc(100vw - 20px);
+      }
+
+      .key {
+        font-size: 20px;
+      }
+
+      .key.small {
+        font-size: 12px;
+        padding-left: 6px;
+      }
+
+      .hands {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="titlebar">
+      <div class="logo">侠</div>
+      <div>打字侠</div>
+      <div class="article-tools">
+        <select id="articleSelect" aria-label="选择练习文章"></select>
+        <button class="primary" id="addArticleBtn" type="button">添加文章</button>
+        <button id="deleteArticleBtn" type="button">删除</button>
+      </div>
+    </header>
+
+    <section class="lesson" aria-label="练习内容">
+      <div class="phrase" id="phrase"></div>
+      <div class="caret-line" id="progressLine"></div>
+    </section>
+
+    <section class="trainer" aria-label="键盘练习">
+      <div class="hud">
+        <div class="current">下一个键 <strong id="nextKey">z</strong></div>
+        <div class="stats">
+          <span>正确 <strong id="rightCount">0</strong></span>
+          <span>错误 <strong id="wrongCount">0</strong></span>
+          <span>进度 <strong id="progressText">0%</strong></span>
+        </div>
+      </div>
+
+      <div class="keyboard" id="keyboard"></div>
+
+      <div class="hands" aria-hidden="true">
+        <div class="finger left little" data-finger="left-little"></div>
+        <div class="finger left ring" data-finger="left-ring"></div>
+        <div class="finger left middle" data-finger="left-middle"></div>
+        <div class="finger left index" data-finger="left-index"></div>
+        <div class="thumb left" data-finger="thumb"></div>
+        <div class="thumb right" data-finger="thumb"></div>
+        <div class="finger right index" data-finger="right-index"></div>
+        <div class="finger right middle" data-finger="right-middle"></div>
+        <div class="finger right ring" data-finger="right-ring"></div>
+        <div class="finger right little" data-finger="right-little"></div>
+      </div>
+
+      <div class="toast" id="toast">直接开始打拼音，空格也算一键。清脆音效会在第一次按键后开启。</div>
+      <input class="hidden-input" id="typingInput" autocomplete="off" autocapitalize="off" spellcheck="false">
+    </section>
+  </main>
+
+  <div class="editor-backdrop" id="editorBackdrop" aria-hidden="true">
+    <form class="editor" id="articleForm">
+      <h2>添加练习文章</h2>
+      <label>
+        文章名称
+        <input id="articleTitleInput" maxlength="24" placeholder="例如：我的拼音练习">
+      </label>
+      <label>
+        显示内容
+        <textarea id="articleDisplayInput" placeholder="这里写你想看到的文章，可以是中文、英文或数字。"></textarea>
+      </label>
+      <label>
+        实际输入内容
+        <textarea id="articleTargetInput" placeholder="中文文章建议填写不带声调的拼音；英文文章可直接复制显示内容。"></textarea>
+      </label>
+      <p class="editor-help">提示：实际输入内容会按原样练习。想减少空格，就不要在每个字之间加空格。</p>
+      <div class="editor-actions">
+        <button id="cancelArticleBtn" type="button">取消</button>
+        <button class="primary" type="submit">保存</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const builtinArticles = [
+      {
+        id: "basic",
+        title: "基础句：打字要求",
+        units: [
+          { py: "zhe", show: "zhè", hz: "这" },
+          { py: "shi", show: "shì", hz: "是" },
+          { py: "lian", show: "liàn", hz: "练" },
+          { py: "xi", show: "xí", hz: "习" },
+          { py: "da", show: "dǎ", hz: "打" },
+          { py: "zi", show: "zì", hz: "字" },
+          { py: "shou", show: "shǒu", hz: "首" },
+          { py: "yao", show: "yào", hz: "要" },
+          { py: "ye", show: "yě", hz: "也" },
+          { py: "shi", show: "shì", hz: "是" },
+          { py: "wei", show: "wéi", hz: "唯" },
+          { py: "yi", show: "yī", hz: "一" },
+          { py: "de", show: "de", hz: "的" },
+          { py: "yao", show: "yāo", hz: "要" },
+          { py: "qiu", show: "qiú", hz: "求" },
+          { py: ".", hz: "." }
+        ]
+      },
+      {
+        id: "calm",
+        title: "短句：专注练习",
+        units: [
+          { py: "jin", show: "jīn", hz: "今" },
+          { py: "tian", show: "tiān", hz: "天" },
+          { py: "de", show: "de", hz: "的" },
+          { py: "lian", show: "liàn", hz: "练" },
+          { py: "xi", show: "xí", hz: "习" },
+          { py: "yao", show: "yào", hz: "要" },
+          { py: "man", show: "màn", hz: "慢" },
+          { py: "yi", show: "yì", hz: "一" },
+          { py: "dian", show: "diǎn", hz: "点" },
+          { py: ",", hz: "，" },
+          { py: "wen", show: "wěn", hz: "稳" },
+          { py: "yi", show: "yì", hz: "一" },
+          { py: "dian", show: "diǎn", hz: "点" },
+          { py: ".", hz: "。" }
+        ]
+      },
+      {
+        id: "english",
+        title: "英文：Typing rhythm",
+        display: "Typing is a small rhythm. Keep your eyes on the words.",
+        target: "typing is a small rhythm. keep your eyes on the words."
+      }
+    ];
+
+    const rows = [
+      [
+        ["`", "~", "`"], ["1", "!", "1"], ["2", "@", "2"], ["3", "#", "3"], ["4", "$", "4"], ["5", "%", "5"], ["6", "^", "6"],
+        ["7", "&", "7"], ["8", "*", "8"], ["9", "(", "9"], ["0", ")", "0"], ["-", "_", "-"], ["=", "+", "="], ["Backspace", "⇦ 退格", null, "small"]
+      ],
+      [["Tab", "→首行缩进", null, "small"], ["q"], ["w"], ["e"], ["r"], ["t"], ["y"], ["u"], ["i"], ["o"], ["p"], ["[", "{", "["], ["]", "}", "]"], ["\\", "|", "\\"]],
+      [["CapsLock", "⇪ 大写锁定", null, "small"], ["a"], ["s"], ["d"], ["f"], ["g"], ["h"], ["j"], ["k"], ["l"], [";", ":", ";"], ["'", "\"", "'"], ["Enter", "Enter 回车", null, "small"]],
+      [["ShiftLeft", "Shift", null, "small"], ["z"], ["x"], ["c"], ["v"], ["b"], ["n"], ["m"], [",", "<", ","], [".", ">", "."], ["/", "?", "/"], ["ShiftRight", "Shift", null, "small"]],
+      [["Control", "Ctrl", null, "small"], ["Alt", "Alt", null, "small"], [" ", "Space 空格", null, "small"], ["AltGraph", "Alt", null, "small"], ["Meta", "", null, "small"]]
+    ];
+
+    const fingerMap = {
+      q: "left-little", a: "left-little", z: "left-little", "1": "left-little", "`": "left-little",
+      w: "left-ring", s: "left-ring", x: "left-ring", "2": "left-ring",
+      e: "left-middle", d: "left-middle", c: "left-middle", "3": "left-middle",
+      r: "left-index", f: "left-index", v: "left-index", t: "left-index", g: "left-index", b: "left-index", "4": "left-index", "5": "left-index",
+      y: "right-index", h: "right-index", n: "right-index", u: "right-index", j: "right-index", m: "right-index", "6": "right-index", "7": "right-index",
+      i: "right-middle", k: "right-middle", ",": "right-middle", "8": "right-middle",
+      o: "right-ring", l: "right-ring", ".": "right-ring", "9": "right-ring",
+      p: "right-little", ";": "right-little", "/": "right-little", "0": "right-little", "-": "right-little", "=": "right-little", "[": "right-little", "]": "right-little", "\\": "right-little",
+      " ": "thumb"
+    };
+
+    const phraseEl = document.getElementById("phrase");
+    const keyboardEl = document.getElementById("keyboard");
+    const nextKeyEl = document.getElementById("nextKey");
+    const rightCountEl = document.getElementById("rightCount");
+    const wrongCountEl = document.getElementById("wrongCount");
+    const progressTextEl = document.getElementById("progressText");
+    const progressLineEl = document.getElementById("progressLine");
+    const toastEl = document.getElementById("toast");
+    const inputEl = document.getElementById("typingInput");
+    const articleSelectEl = document.getElementById("articleSelect");
+    const addArticleBtn = document.getElementById("addArticleBtn");
+    const deleteArticleBtn = document.getElementById("deleteArticleBtn");
+    const editorBackdrop = document.getElementById("editorBackdrop");
+    const articleForm = document.getElementById("articleForm");
+    const articleTitleInput = document.getElementById("articleTitleInput");
+    const articleDisplayInput = document.getElementById("articleDisplayInput");
+    const articleTargetInput = document.getElementById("articleTargetInput");
+    const cancelArticleBtn = document.getElementById("cancelArticleBtn");
+
+    const storageKey = "typingHeroCustomArticles";
+    let customArticles = loadCustomArticles();
+    let articles = [...builtinArticles, ...customArticles];
+    let currentArticle = articles[0];
+    let lesson = currentArticle.units || [];
+    let target = articleTarget(currentArticle);
+    let position = 0;
+    let right = 0;
+    let wrong = 0;
+    let audioContext;
+    let noiseBuffer;
+    let toastTimer;
+
+    function loadCustomArticles() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        return Array.isArray(stored) ? stored.filter(item => item && item.title && item.target) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCustomArticles() {
+      localStorage.setItem(storageKey, JSON.stringify(customArticles));
+    }
+
+    function articleTarget(article) {
+      if (article.target) return article.target.toLowerCase();
+      return (article.units || []).map(item => item.py).join("").toLowerCase();
+    }
+
+    function articleDisplayText(article) {
+      if (article.display) return article.display;
+      return (article.units || []).map(item => item.hz).join("");
+    }
+
+    function refreshArticles(selectedId = currentArticle.id) {
+      articles = [...builtinArticles, ...customArticles];
+      currentArticle = articles.find(item => item.id === selectedId) || articles[0];
+      articleSelectEl.innerHTML = articles.map(item => `<option value="${item.id}">${item.title}</option>`).join("");
+      articleSelectEl.value = currentArticle.id;
+      deleteArticleBtn.disabled = !currentArticle.custom;
+      lesson = currentArticle.units || [];
+      target = articleTarget(currentArticle);
+    }
+
+    function renderPhrase() {
+      if (!lesson.length) {
+        phraseEl.innerHTML = `<div class="article-text" id="articleText"></div>`;
+        renderTextArticle();
+        return;
+      }
+
+      phraseEl.innerHTML = lesson.map((item, index) => `
+        <span class="syllable ${item.py.length === 1 && /[.,，。!?！？]/.test(item.py) ? "punct" : ""}" data-start="${startOf(index)}" data-end="${endOf(index)}">
+          <span class="pinyin">${item.show || item.py}</span>
+          <span class="hanzi">${item.hz}</span>
+        </span>
+      `).join("");
+    }
+
+    function renderTextArticle() {
+      const textEl = document.getElementById("articleText");
+      if (!textEl) return;
+      const display = articleDisplayText(currentArticle);
+      textEl.innerHTML = [...display].map((char, index) => {
+        const className = index < position ? "typed" : index === position ? "current-char" : "";
+        return `<span class="${className}">${escapeHtml(char)}</span>`;
+      }).join("");
+    }
+
+    function startOf(index) {
+      return lesson.slice(0, index).reduce((sum, item) => sum + item.py.length, 0);
+    }
+
+    function endOf(index) {
+      return startOf(index) + lesson[index].py.length;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderKeyboard() {
+      const names = ["numbers", "top", "home", "bottom", "space"];
+      keyboardEl.innerHTML = rows.map((row, index) => `
+        <div class="row ${names[index]}">
+          ${row.map(key => {
+            const id = key[0];
+            const main = key[1] || key[0];
+            const lower = key[2];
+            const extra = key[3] || "";
+            const classes = lower ? "key dual" : `key ${extra}`;
+            return `<div class="${classes}" data-key="${id}">
+              ${lower ? `<span>${main}</span><span>${lower}</span>` : main}
+            </div>`;
+          }).join("")}
+        </div>
+      `).join("");
+    }
+
+    function normalizeKey(event) {
+      if (event.key === "Spacebar") return " ";
+      if (event.key === " ") return " ";
+      if (event.key.length === 1) return event.key.toLowerCase();
+      return event.key;
+    }
+
+    function nextChar() {
+      return target[position] || "";
+    }
+
+    function keyLabel(key) {
+      if (key === " ") return "空格";
+      return key;
+    }
+
+    function updateUi() {
+      const next = nextChar();
+      nextKeyEl.textContent = next ? keyLabel(next) : "完成";
+      rightCountEl.textContent = right;
+      wrongCountEl.textContent = wrong;
+      const progress = target.length ? Math.round((position / target.length) * 100) : 0;
+      progressTextEl.textContent = `${progress}%`;
+      progressLineEl.style.setProperty("--progress", `${progress}%`);
+
+      document.querySelectorAll(".key").forEach(key => {
+        key.classList.remove("next", "wrong");
+        if (matchesKey(key.dataset.key, next)) key.classList.add("next");
+      });
+
+      document.querySelectorAll("[data-finger]").forEach(finger => {
+        finger.classList.toggle("active", finger.dataset.finger === fingerMap[next]);
+      });
+
+      document.querySelectorAll(".syllable").forEach(item => {
+        const start = Number(item.dataset.start);
+        const end = Number(item.dataset.end);
+        item.classList.toggle("done", position >= end);
+        item.classList.toggle("active", position >= start && position < end);
+      });
+
+      renderTextArticle();
+    }
+
+    function matchesKey(id, key) {
+      if (!key) return false;
+      if (key === " " && id === " ") return true;
+      return id.toLowerCase() === key;
+    }
+
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * .08, audioContext.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < data.length; i += 1) {
+          data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2.4);
+        }
+      }
+      if (audioContext.state === "suspended") audioContext.resume();
+    }
+
+    function clickSound(ok) {
+      initAudio();
+      const now = audioContext.currentTime;
+      const noise = audioContext.createBufferSource();
+      const noiseGain = audioContext.createGain();
+      const high = audioContext.createBiquadFilter();
+      const body = audioContext.createOscillator();
+      const bodyGain = audioContext.createGain();
+
+      noise.buffer = noiseBuffer;
+      high.type = "bandpass";
+      high.frequency.value = ok ? 3600 : 900;
+      high.Q.value = ok ? 6.5 : 2.1;
+
+      noiseGain.gain.setValueAtTime(0.0001, now);
+      noiseGain.gain.exponentialRampToValueAtTime(ok ? .24 : .13, now + .003);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + (ok ? .032 : .075));
+
+      body.type = "triangle";
+      body.frequency.setValueAtTime(ok ? 190 : 96, now);
+      body.frequency.exponentialRampToValueAtTime(ok ? 118 : 74, now + .04);
+      bodyGain.gain.setValueAtTime(0.0001, now);
+      bodyGain.gain.exponentialRampToValueAtTime(ok ? .045 : .07, now + .004);
+      bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + (ok ? .055 : .11));
+
+      noise.connect(high);
+      high.connect(noiseGain);
+      noiseGain.connect(audioContext.destination);
+      body.connect(bodyGain);
+      bodyGain.connect(audioContext.destination);
+      noise.start(now);
+      body.start(now);
+      noise.stop(now + .08);
+      body.stop(now + .12);
+    }
+
+    function markPressed(key, ok) {
+      const targetKey = [...document.querySelectorAll(".key")].find(item => matchesKey(item.dataset.key, key));
+      if (!targetKey) return;
+      targetKey.classList.add(ok ? "pressed" : "wrong");
+      window.setTimeout(() => targetKey.classList.remove("pressed", "wrong"), 120);
+    }
+
+    function showToast(text) {
+      toastEl.textContent = text;
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => {
+        toastEl.textContent = "继续输入，按 Esc 可重新开始。";
+      }, 1800);
+    }
+
+    function reset() {
+      position = 0;
+      right = 0;
+      wrong = 0;
+      renderPhrase();
+      updateUi();
+      showToast("已重新开始。");
+    }
+
+    function selectArticle(id) {
+      refreshArticles(id);
+      reset();
+      showToast(`已切换到《${currentArticle.title}》。`);
+    }
+
+    function openEditor() {
+      articleTitleInput.value = "";
+      articleDisplayInput.value = "";
+      articleTargetInput.value = "";
+      editorBackdrop.classList.add("open");
+      editorBackdrop.setAttribute("aria-hidden", "false");
+      articleTitleInput.focus();
+    }
+
+    function closeEditor() {
+      editorBackdrop.classList.remove("open");
+      editorBackdrop.setAttribute("aria-hidden", "true");
+      inputEl.focus();
+    }
+
+    function saveArticle(event) {
+      event.preventDefault();
+      const title = articleTitleInput.value.trim();
+      const display = articleDisplayInput.value.trim();
+      const typed = articleTargetInput.value.trim().toLowerCase();
+      if (!title || !display || !typed) {
+        showToast("文章名称、显示内容、实际输入内容都要填写。");
+        return;
+      }
+
+      const article = {
+        id: `custom-${Date.now()}`,
+        title,
+        display,
+        target: typed,
+        custom: true
+      };
+      customArticles.push(article);
+      saveCustomArticles();
+      closeEditor();
+      refreshArticles(article.id);
+      reset();
+      showToast(`已添加《${title}》。`);
+    }
+
+    function deleteCurrentArticle() {
+      if (!currentArticle.custom) {
+        showToast("内置文章不能删除。");
+        return;
+      }
+      customArticles = customArticles.filter(item => item.id !== currentArticle.id);
+      saveCustomArticles();
+      refreshArticles(builtinArticles[0].id);
+      reset();
+      showToast("已删除自定义文章。");
+    }
+
+    function isEditorTarget(targetNode) {
+      return targetNode.closest && targetNode.closest(".editor, .article-tools");
+    }
+
+    function handleKeydown(event) {
+      if (isEditorTarget(event.target)) return;
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        reset();
+        return;
+      }
+      if (event.key === "Backspace") {
+        event.preventDefault();
+        if (position > 0) position -= 1;
+        updateUi();
+        clickSound(false);
+        return;
+      }
+
+      const typed = normalizeKey(event);
+      if (typed.length !== 1 || !target.length) return;
+      event.preventDefault();
+      const expected = nextChar();
+      const ok = typed === expected;
+      markPressed(typed, ok);
+
+      if (ok) {
+        position += 1;
+        right += 1;
+        clickSound(true);
+        if (position === target.length) {
+          updateUi();
+          showToast("完成！按 Esc 再练一遍。");
+          return;
+        }
+      } else {
+        wrong += 1;
+        clickSound(false);
+        showToast(`应该按 ${keyLabel(expected)}，刚才按的是 ${keyLabel(typed)}。`);
+      }
+      updateUi();
+    }
+
+    document.addEventListener("keydown", handleKeydown);
+    document.addEventListener("pointerdown", () => inputEl.focus());
+    window.addEventListener("load", () => inputEl.focus());
+    articleSelectEl.addEventListener("change", () => selectArticle(articleSelectEl.value));
+    addArticleBtn.addEventListener("click", openEditor);
+    deleteArticleBtn.addEventListener("click", deleteCurrentArticle);
+    cancelArticleBtn.addEventListener("click", closeEditor);
+    articleForm.addEventListener("submit", saveArticle);
+    editorBackdrop.addEventListener("pointerdown", event => {
+      if (event.target === editorBackdrop) closeEditor();
+    });
+
+    refreshArticles();
+    renderPhrase();
+    renderKeyboard();
+    updateUi();
+  </script>
+</body>
+</html>

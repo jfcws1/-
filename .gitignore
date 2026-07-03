@@ -1,0 +1,10 @@
+node_modules/
+.edge-profile-typing/
+*.log
+dist/
+build/
+release/
+out/
+*.asar
+.DS_Store
+Thumbs.db

@@ -1,0 +1,14 @@
+{
+  "name": "typing-software",
+  "version": "1.0.0",
+  "description": "打字侠风格的本地打字练习软件",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "web": "powershell -NoProfile -ExecutionPolicy Bypass -File start-typing-hero.ps1"
+  },
+  "devDependencies": {
+    "electron": "^37.0.0"
+  }
+}

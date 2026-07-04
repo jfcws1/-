@@ -21,7 +21,10 @@ $running = Get-CimInstance Win32_Process -Filter "Name = 'msedge.exe'" |
 if ($running) {
   try {
     $shell = New-Object -ComObject WScript.Shell
-    $null = $shell.AppActivate('键道')
+    if ($shell.AppActivate('键道')) {
+      Start-Sleep -Milliseconds 150
+      $shell.SendKeys('{F5}')
+    }
   } catch {
     # If focusing fails, keep the existing single window and avoid opening another.
   }

@@ -419,12 +419,12 @@
       position: absolute;
       width: 36px;
       height: 46px;
-      border: 3px solid rgba(105, 111, 120, .5);
-      border-radius: 18px 18px 22px 22px;
-      background: radial-gradient(circle at 50% 24%, rgba(255, 255, 255, .62), rgba(128, 134, 143, .24) 62%, rgba(128, 134, 143, .12));
-      box-shadow: inset 0 -8px 12px rgba(105, 111, 120, .13), 0 8px 18px rgba(80, 88, 100, .1);
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      box-shadow: none;
       transform-origin: 50% 0;
-      opacity: .72;
+      opacity: .8;
       transition: border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease, background .12s ease;
     }
 
@@ -432,13 +432,14 @@
       content: "";
       position: absolute;
       left: 50%;
-      top: 7px;
-      width: 12px;
-      height: 12px;
+      top: 50%;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, .54);
-      border: 1px solid rgba(105, 111, 120, .28);
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .78), rgba(117, 123, 132, .22) 62%, rgba(117, 123, 132, .12));
+      border: 2px solid rgba(112, 118, 126, .42);
+      box-shadow: 0 5px 13px rgba(80, 88, 100, .12);
     }
 
     .finger.left.little { left: 136px; top: 116px; transform: rotate(8deg); }
@@ -455,10 +456,10 @@
       top: 238px;
       width: 84px;
       height: 34px;
-      border: 3px solid rgba(105, 111, 120, .48);
-      border-radius: 999px;
-      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, .6), rgba(128, 134, 143, .22) 68%, rgba(128, 134, 143, .1));
-      opacity: .7;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      opacity: .8;
       transition: border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease;
     }
 
@@ -466,13 +467,14 @@
       content: "";
       position: absolute;
       left: 50%;
-      top: 9px;
-      width: 14px;
-      height: 14px;
+      top: 50%;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, .5);
-      border: 1px solid rgba(105, 111, 120, .28);
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .78), rgba(117, 123, 132, .22) 62%, rgba(117, 123, 132, .12));
+      border: 2px solid rgba(112, 118, 126, .42);
+      box-shadow: 0 5px 13px rgba(80, 88, 100, .12);
     }
 
     .thumb.left {
@@ -487,16 +489,14 @@
 
     .finger.active,
     .thumb.active {
-      border-color: rgba(52, 112, 220, .96);
       opacity: 1;
-      background: radial-gradient(circle at 50% 22%, rgba(255, 255, 255, .74), rgba(95, 157, 242, .34) 62%, rgba(95, 157, 242, .2));
-      box-shadow: 0 0 0 8px rgba(52, 112, 220, .12), 0 8px 20px rgba(52, 112, 220, .22);
     }
 
     .finger.active::after,
     .thumb.active::after {
-      background: rgba(52, 112, 220, .22);
+      background: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .82), rgba(79, 142, 233, .38) 62%, rgba(79, 142, 233, .24));
       border-color: rgba(52, 112, 220, .95);
+      box-shadow: 0 0 0 7px rgba(52, 112, 220, .12), 0 7px 18px rgba(52, 112, 220, .22);
     }
 
     .toast {

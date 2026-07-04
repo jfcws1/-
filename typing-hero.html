@@ -405,7 +405,13 @@
       height: 420px;
       transform: translateX(-50%);
       pointer-events: none;
-      z-index: 1;
+      z-index: 3;
+      opacity: 0;
+      mix-blend-mode: multiply;
+      transition: opacity .16s ease;
+    }
+
+    .trainer.show-hands .hands {
       opacity: .72;
     }
 
@@ -510,6 +516,11 @@
       box-shadow: 0 12px 30px rgba(46, 55, 70, .08);
       z-index: 4;
       pointer-events: none;
+    }
+
+    .trainer.show-hands .key.finger-anchor::after {
+      background: rgba(120, 124, 130, .22);
+      border-color: rgba(120, 124, 130, .48);
     }
 
     .hidden-input {
@@ -994,6 +1005,7 @@
     const fingerAnchorKeys = new Set(["a", "s", "d", "f", "j", "k", "l", ";", " "]);
 
     const phraseEl = document.getElementById("phrase");
+    const trainerEl = document.querySelector(".trainer");
     const keyboardEl = document.getElementById("keyboard");
     const nextKeyEl = document.getElementById("nextKey");
     const rightCountEl = document.getElementById("rightCount");
@@ -1343,6 +1355,7 @@
 
     function updateUi() {
       const next = nextChar();
+      trainerEl.classList.toggle("show-hands", currentCollection === "fingering");
       nextKeyEl.textContent = next ? keyLabel(next) : "完成";
       rightCountEl.textContent = right;
       wrongCountEl.textContent = wrong;

@@ -364,28 +364,6 @@
       box-shadow: 0 0 0 5px rgba(75, 133, 228, .25), inset 0 -2px 0 rgba(0, 0, 0, .08);
     }
 
-    .key.finger-anchor::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: 7px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      transform: translateX(-50%);
-      background: rgba(120, 124, 130, .18);
-      border: 2px solid rgba(120, 124, 130, .34);
-      pointer-events: none;
-    }
-
-    .key.finger-anchor.next::after {
-      width: 24px;
-      height: 24px;
-      background: rgba(53, 117, 222, .28);
-      border-color: rgba(53, 117, 222, .7);
-      box-shadow: 0 0 0 6px rgba(53, 117, 222, .13);
-    }
-
     .key.pressed {
       transform: translateY(2px);
       background: linear-gradient(#d7eaff, #b7d7fb);
@@ -424,7 +402,7 @@
       background: transparent;
       box-shadow: none;
       transform-origin: 50% 0;
-      opacity: .8;
+      opacity: 0;
       transition: border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease, background .12s ease;
     }
 
@@ -459,7 +437,7 @@
       border: 0;
       border-radius: 50%;
       background: transparent;
-      opacity: .8;
+      opacity: 0;
       transition: border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease;
     }
 
@@ -513,11 +491,6 @@
       box-shadow: 0 12px 30px rgba(46, 55, 70, .08);
       z-index: 4;
       pointer-events: none;
-    }
-
-    .trainer.show-hands .key.finger-anchor::after {
-      background: rgba(120, 124, 130, .22);
-      border-color: rgba(120, 124, 130, .48);
     }
 
     .hidden-input {
@@ -706,8 +679,8 @@
         <div class="finger left ring" data-finger="left-ring"></div>
         <div class="finger left middle" data-finger="left-middle"></div>
         <div class="finger left index" data-finger="left-index"></div>
-        <div class="thumb left" data-finger="thumb"></div>
-        <div class="thumb right" data-finger="thumb"></div>
+        <div class="thumb left" data-finger="left-thumb"></div>
+        <div class="thumb right" data-finger="right-thumb"></div>
         <div class="finger right index" data-finger="right-index"></div>
         <div class="finger right middle" data-finger="right-middle"></div>
         <div class="finger right ring" data-finger="right-ring"></div>
@@ -986,7 +959,7 @@
       i: "right-middle", k: "right-middle", ",": "right-middle", "8": "right-middle",
       o: "right-ring", l: "right-ring", ".": "right-ring", "9": "right-ring",
       p: "right-little", ";": "right-little", "/": "right-little", "0": "right-little", "-": "right-little", "=": "right-little", "[": "right-little", "]": "right-little", "\\": "right-little",
-      " ": "thumb"
+      " ": "right-thumb"
     };
 
     const shiftedKeyMap = {
@@ -998,8 +971,6 @@
     Object.entries(shiftedKeyMap).forEach(([shifted, base]) => {
       fingerMap[shifted] = fingerMap[base];
     });
-
-    const fingerAnchorKeys = new Set(["a", "s", "d", "f", "j", "k", "l", ";", " "]);
 
     const phraseEl = document.getElementById("phrase");
     const trainerEl = document.querySelector(".trainer");
@@ -1323,8 +1294,7 @@
             const main = key[1] || key[0];
             const lower = key[2];
             const extra = key[3] || "";
-            const anchor = fingerAnchorKeys.has(id) ? "finger-anchor" : "";
-            const classes = lower ? `key dual ${anchor}` : `key ${extra} ${anchor}`;
+            const classes = lower ? "key dual" : `key ${extra}`;
             return `<div class="${classes}" data-key="${id}">
               ${lower ? `<span>${main}</span><span>${lower}</span>` : main}
             </div>`;

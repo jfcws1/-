@@ -10,5 +10,8 @@
   },
   "devDependencies": {
     "electron": "^37.0.0"
+  },
+  "dependencies": {
+    "pinyin-pro": "^3.28.1"
   }
 }

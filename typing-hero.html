@@ -73,11 +73,13 @@
     .article-tools select {
       width: 220px;
       height: 30px;
-      padding: 0 8px;
+      padding: 0 34px 0 8px;
+      text-overflow: ellipsis;
     }
 
     .article-tools select.collection-select {
       width: 140px;
+      padding-right: 30px;
     }
 
     .article-tools button,
@@ -718,6 +720,7 @@
     </form>
   </div>
 
+  <script src="pinyin-pro.js"></script>
   <script src="tang300-data.js"></script>
   <script src="caigentan-data.js"></script>
   <script>
@@ -1034,7 +1037,16 @@
     }
 
     function normalizeCustomArticle(article) {
-      return { ...article, collection: "custom", custom: true };
+      const normalized = { ...article, collection: "custom", custom: true };
+      if (Array.isArray(normalized.units)) {
+        normalized.units = normalized.units.map(unit => {
+          if (!unit || !isChineseChar(unit.hz || "")) return unit;
+          const py = unit.py && !isChineseChar(unit.py) ? unit.py : pinyinForChar(unit.hz, "none");
+          const show = unit.show && unit.show !== unit.py ? unit.show : pinyinForChar(unit.hz, "symbol");
+          return { ...unit, py, show, unknown: py === unit.hz };
+        });
+      }
+      return normalized;
     }
 
     function loadHiddenCollections() {
@@ -1067,7 +1079,11 @@
     }
 
     function renderCollectionOptions() {
-      const visibleCollections = collections.filter(item => item.fixed || !hiddenCollections.has(item.id) || item.id === "custom");
+      const visibleCollections = collections.filter(item => {
+        if (item.fixed) return true;
+        if (item.id === "custom") return customArticles.length > 0 || currentCollection === "custom";
+        return !hiddenCollections.has(item.id);
+      });
       collectionSelectEl.innerHTML = visibleCollections.map(item => `<option value="${item.id}">${item.title}</option>`).join("");
       collectionSelectEl.value = currentCollection;
     }
@@ -1195,14 +1211,37 @@
       return units.map(item => item.py || "").join("");
     }
 
+    function pinyinApi() {
+      return window.pinyinPro && typeof window.pinyinPro.pinyin === "function" ? window.pinyinPro.pinyin : null;
+    }
+
+    function pinyinForChar(char, toneType = "none") {
+      const api = pinyinApi();
+      if (api) {
+        try {
+          const value = api(char, {
+            toneType,
+            separator: "",
+            nonZh: "removed",
+            v: true
+          }).trim();
+          if (value) return value.toLowerCase();
+        } catch {
+          // Fall back to the small built-in dictionary below.
+        }
+      }
+      return pinyinDict[char] || char;
+    }
+
     function charToTypingUnit(char) {
       if (char === "\r") return null;
       if (char === "\n") return { py: " ", hz: " ", show: "空" };
       if (/\s/.test(char)) return { py: " ", hz: " ", show: "空" };
       if (isPunctuationChar(char)) return { py: normalizePunctuation(char), hz: char, show: normalizePunctuation(char) };
       if (isChineseChar(char)) {
-        const py = pinyinDict[char] || char;
-        return { py, hz: char, unknown: py === char };
+        const py = pinyinForChar(char, "none");
+        const show = pinyinForChar(char, "symbol");
+        return { py, hz: char, show, unknown: py === char };
       }
       return { py: char.toLowerCase(), hz: char };
     }

@@ -114,13 +114,33 @@
 
     .lesson {
       position: relative;
-      padding: 0 58px 18px;
+      padding: 0 48px 18px 58px;
       background: var(--paper);
       border-bottom: 1px solid #e4e8f0;
       overflow: hidden auto;
       scroll-behavior: smooth;
-      scrollbar-width: thin;
-      scrollbar-color: #c6ccd6 transparent;
+      scrollbar-gutter: stable;
+      scrollbar-width: auto;
+      scrollbar-color: #8d95a3 #edf1f6;
+    }
+
+    .lesson::-webkit-scrollbar {
+      width: 14px;
+    }
+
+    .lesson::-webkit-scrollbar-track {
+      background: #edf1f6;
+      border-radius: 999px;
+    }
+
+    .lesson::-webkit-scrollbar-thumb {
+      background: #9aa3b1;
+      border: 3px solid #edf1f6;
+      border-radius: 999px;
+    }
+
+    .lesson::-webkit-scrollbar-thumb:hover {
+      background: #747e8e;
     }
 
     .phrase {
@@ -1352,10 +1372,18 @@
     function scrollCurrentIntoView() {
       const active = document.querySelector(".syllable.active") || document.querySelector(".article-text .current-char");
       if (!active) return;
-      const lessonRect = phraseEl.parentElement.getBoundingClientRect();
+      const lessonPanel = phraseEl.parentElement;
+      const lessonRect = lessonPanel.getBoundingClientRect();
       const activeRect = active.getBoundingClientRect();
-      if (activeRect.top < lessonRect.top + 56 || activeRect.bottom > lessonRect.bottom - 24) {
-        active.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+      const topGuard = 72;
+      const bottomGuard = Math.max(96, lessonRect.height * .38);
+
+      if (activeRect.top < lessonRect.top + topGuard || activeRect.bottom > lessonRect.bottom - bottomGuard) {
+        const targetTop = lessonPanel.scrollTop + activeRect.top - lessonRect.top - Math.max(68, lessonRect.height * .28);
+        lessonPanel.scrollTo({
+          top: Math.max(0, targetTop),
+          behavior: "smooth"
+        });
       }
     }
 

@@ -329,6 +329,28 @@
       box-shadow: 0 0 0 5px rgba(75, 133, 228, .25), inset 0 -2px 0 rgba(0, 0, 0, .08);
     }
 
+    .key.finger-anchor::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 7px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: rgba(120, 124, 130, .18);
+      border: 2px solid rgba(120, 124, 130, .34);
+      pointer-events: none;
+    }
+
+    .key.finger-anchor.next::after {
+      width: 24px;
+      height: 24px;
+      background: rgba(53, 117, 222, .28);
+      border-color: rgba(53, 117, 222, .7);
+      box-shadow: 0 0 0 6px rgba(53, 117, 222, .13);
+    }
+
     .key.pressed {
       transform: translateY(2px);
       background: linear-gradient(#d7eaff, #b7d7fb);
@@ -343,12 +365,13 @@
     .hands {
       position: absolute;
       left: 50%;
-      top: 143px;
+      top: 132px;
       width: min(900px, calc(100vw - 110px));
       height: 420px;
       transform: translateX(-50%);
       pointer-events: none;
       z-index: 1;
+      opacity: .72;
     }
 
     .finger {
@@ -361,6 +384,19 @@
       transform-origin: 50% 0;
       opacity: .88;
       transition: border-color .12s ease, transform .12s ease, opacity .12s ease;
+    }
+
+    .finger::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: rgba(116, 120, 124, .2);
+      border: 3px solid rgba(116, 120, 124, .55);
     }
 
     .finger.left.little { left: 70px; top: 92px; transform: rotate(16deg); }
@@ -384,6 +420,19 @@
       transition: border-color .12s ease, transform .12s ease;
     }
 
+    .thumb::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: rgba(116, 120, 124, .2);
+      border: 3px solid rgba(116, 120, 124, .55);
+    }
+
     .thumb.left {
       left: 352px;
       transform: rotate(-20deg);
@@ -399,6 +448,13 @@
       border-color: rgba(52, 112, 220, .92);
       border-bottom-color: transparent;
       opacity: 1;
+    }
+
+    .finger.active::after,
+    .thumb.active::after {
+      background: rgba(52, 112, 220, .22);
+      border-color: rgba(52, 112, 220, .95);
+      box-shadow: 0 0 0 8px rgba(52, 112, 220, .12);
     }
 
     .thumb.active {
@@ -648,6 +704,105 @@
   <script src="tang300-data.js"></script>
   <script src="caigentan-data.js"></script>
   <script>
+    const fingerPracticeArticles = [
+      {
+        id: "finger-home",
+        title: "字母练习：基本键",
+        category: "字母练习",
+        collection: "fingering",
+        display: "asdf jkl; asdf jkl; fj dk sl a; fj dk sl a;",
+        target: "asdf jkl; asdf jkl; fj dk sl a; fj dk sl a;"
+      },
+      {
+        id: "finger-left",
+        title: "字母练习：左手",
+        category: "字母练习",
+        collection: "fingering",
+        display: "qaz wsx edc rfv tgb qaz wsx edc rfv tgb",
+        target: "qaz wsx edc rfv tgb qaz wsx edc rfv tgb"
+      },
+      {
+        id: "finger-right",
+        title: "字母练习：右手",
+        category: "字母练习",
+        collection: "fingering",
+        display: "yhn ujm ik, ol. p;/ yhn ujm ik, ol. p;/",
+        target: "yhn ujm ik, ol. p;/ yhn ujm ik, ol. p;/"
+      },
+      {
+        id: "finger-letters-all",
+        title: "字母练习：全键位",
+        category: "字母练习",
+        collection: "fingering",
+        display: "qwert yuiop asdfg hjkl; zxcvb nm,./",
+        target: "qwert yuiop asdfg hjkl; zxcvb nm,./"
+      },
+      {
+        id: "finger-numbers-left",
+        title: "数字练习：左手数字",
+        category: "数字练习",
+        collection: "fingering",
+        display: "12345 54321 11223 34455",
+        target: "12345 54321 11223 34455"
+      },
+      {
+        id: "finger-numbers-right",
+        title: "数字练习：右手数字",
+        category: "数字练习",
+        collection: "fingering",
+        display: "67890 09876 66778 89900",
+        target: "67890 09876 66778 89900"
+      },
+      {
+        id: "finger-numbers-all",
+        title: "数字练习：全数字",
+        category: "数字练习",
+        collection: "fingering",
+        display: "13579 24680 10293 84756 20260704",
+        target: "13579 24680 10293 84756 20260704"
+      },
+      {
+        id: "finger-symbol-basic",
+        title: "符号练习：基础符号",
+        category: "符号练习",
+        collection: "fingering",
+        display: ", . / ; ' [ ] - = ,./ ;'[] -=",
+        target: ", . / ; ' [ ] - = ,./ ;'[] -="
+      },
+      {
+        id: "finger-symbol-shift",
+        title: "符号练习：Shift 符号",
+        category: "符号练习",
+        collection: "fingering",
+        display: "! @ # $ % ^ & * ( ) _ + !@#$%^&*()_+",
+        target: "! @ # $ % ^ & * ( ) _ + !@#$%^&*()_+"
+      },
+      {
+        id: "finger-symbol-code",
+        title: "符号练习：代码符号",
+        category: "符号练习",
+        collection: "fingering",
+        display: "{} [] () <> :: ; \"\" '' // == += -= ",
+        target: "{} [] () <> :: ; \"\" '' // == += -= "
+      },
+      {
+        id: "finger-combo-pinyin",
+        title: "组合练习：拼音与标点",
+        category: "组合练习",
+        collection: "fingering",
+        display: "zh ch sh ang eng ing, zhong guo, jian dao.",
+        target: "zh ch sh ang eng ing, zhong guo, jian dao."
+      },
+      {
+        id: "finger-combo-mixed",
+        title: "组合练习：字母数字符号",
+        category: "组合练习",
+        collection: "fingering",
+        display: "abc123 def456 key-2026 code_88 ok!",
+        target: "abc123 def456 key-2026 code_88 ok!"
+      }
+    ];
+
     const builtinArticles = [
       {
         id: "basic",
@@ -763,12 +918,14 @@
       }));
 
     const builtinLibrary = [
+      ...fingerPracticeArticles,
       ...builtinArticles.filter(item => item.collection !== "caigentan"),
       ...tangPoems,
       ...caigentanItems
     ];
 
     const collections = [
+      { id: "fingering", title: "指法练习", fixed: true },
       { id: "basic", title: "基础练习" },
       { id: "tang300", title: `唐诗三百首${tangPoems.length ? `（${tangPoems.length}首）` : ""}` },
       { id: "caigentan", title: `菜根谭全集${caigentanItems.length ? `（${caigentanItems.length}则）` : ""}` },
@@ -787,6 +944,18 @@
       p: "right-little", ";": "right-little", "/": "right-little", "0": "right-little", "-": "right-little", "=": "right-little", "[": "right-little", "]": "right-little", "\\": "right-little",
       " ": "thumb"
     };
+
+    const shiftedKeyMap = {
+      "~": "`", "!": "1", "@": "2", "#": "3", "$": "4", "%": "5", "^": "6",
+      "&": "7", "*": "8", "(": "9", ")": "0", "_": "-", "+": "=",
+      "{": "[", "}": "]", "|": "\\", ":": ";", "\"": "'", "<": ",", ">": ".", "?": "/"
+    };
+
+    Object.entries(shiftedKeyMap).forEach(([shifted, base]) => {
+      fingerMap[shifted] = fingerMap[base];
+    });
+
+    const fingerAnchorKeys = new Set(["a", "s", "d", "f", "j", "k", "l", ";", " "]);
 
     const phraseEl = document.getElementById("phrase");
     const keyboardEl = document.getElementById("keyboard");
@@ -816,7 +985,7 @@
     const hiddenCollectionsKey = "typingHeroHiddenCollections";
     let customArticles = loadCustomArticles();
     let hiddenCollections = loadHiddenCollections();
-    let currentCollection = "basic";
+    let currentCollection = "fingering";
     let articles = [];
     let currentArticle = builtinLibrary[0];
     let lesson = currentArticle.units || [];
@@ -827,6 +996,7 @@
     let audioContext;
     let noiseBuffer;
     let toastTimer;
+    let startTime = 0;
 
     function loadCustomArticles() {
       try {
@@ -881,7 +1051,7 @@
     }
 
     function renderCollectionOptions() {
-      const visibleCollections = collections.filter(item => !hiddenCollections.has(item.id) || item.id === "custom");
+      const visibleCollections = collections.filter(item => item.fixed || !hiddenCollections.has(item.id) || item.id === "custom");
       collectionSelectEl.innerHTML = visibleCollections.map(item => `<option value="${item.id}">${item.title}</option>`).join("");
       collectionSelectEl.value = currentCollection;
     }
@@ -894,7 +1064,7 @@
     }
 
     function renderArticleOptions() {
-      if (currentCollection !== "tang300" && currentCollection !== "caigentan") {
+      if (currentCollection !== "tang300" && currentCollection !== "caigentan" && currentCollection !== "fingering") {
         articleSelectEl.innerHTML = articles.map(item => `<option value="${item.id}">${escapeHtml(articleLabel(item))}</option>`).join("");
         return;
       }
@@ -933,11 +1103,17 @@
     }
 
     function firstAvailableCollection() {
-      const found = collections.find(item => item.id !== "custom" && !hiddenCollections.has(item.id) && articlesForCollection(item.id).length);
+      const found = collections.find(item => item.id !== "custom" && (item.fixed || !hiddenCollections.has(item.id)) && articlesForCollection(item.id).length);
       return found ? found.id : "custom";
     }
 
     function updateDeleteButton() {
+      if (currentCollection === "fingering") {
+        deleteArticleBtn.disabled = true;
+        deleteArticleBtn.textContent = "固定栏目";
+        deleteArticleBtn.title = "指法练习是固定栏目，不能删除。";
+        return;
+      }
       if (currentCollection === "custom") {
         deleteArticleBtn.disabled = !customArticles.length;
         deleteArticleBtn.textContent = customArticles.length > 1 ? "删除本文" : "删除";
@@ -1102,7 +1278,8 @@
             const main = key[1] || key[0];
             const lower = key[2];
             const extra = key[3] || "";
-            const classes = lower ? "key dual" : `key ${extra}`;
+            const anchor = fingerAnchorKeys.has(id) ? "finger-anchor" : "";
+            const classes = lower ? `key dual ${anchor}` : `key ${extra} ${anchor}`;
             return `<div class="${classes}" data-key="${id}">
               ${lower ? `<span>${main}</span><span>${lower}</span>` : main}
             </div>`;
@@ -1124,6 +1301,7 @@
 
     function keyLabel(key) {
       if (key === " ") return "空格";
+      if (shiftedKeyMap[key]) return `Shift + ${shiftedKeyMap[key]}`;
       return key;
     }
 
@@ -1168,7 +1346,7 @@
     function matchesKey(id, key) {
       if (!key) return false;
       if (key === " " && id === " ") return true;
-      return id.toLowerCase() === key;
+      return id.toLowerCase() === (shiftedKeyMap[key] || key);
     }
 
     function initAudio() {
@@ -1231,18 +1409,19 @@
       window.setTimeout(() => targetKey.classList.remove("pressed", "wrong"), 120);
     }
 
-    function showToast(text) {
+    function showToast(text, duration = 1800) {
       toastEl.textContent = text;
       window.clearTimeout(toastTimer);
       toastTimer = window.setTimeout(() => {
         toastEl.textContent = "继续输入，按 Esc 可重新开始。";
-      }, 1800);
+      }, duration);
     }
 
     function reset() {
       position = 0;
       right = 0;
       wrong = 0;
+      startTime = 0;
       renderPhrase();
       updateUi();
       showToast("已重新开始。");
@@ -1443,6 +1622,10 @@
     function hideCurrentCollection() {
       const collection = collections.find(item => item.id === currentCollection);
       if (!collection) return;
+      if (collection.fixed) {
+        showToast("指法练习是固定栏目，不能删除。");
+        return;
+      }
       const ok = window.confirm(`确定从界面删除栏目“${collection.title}”吗？内容文件仍保留，刷新不会自动恢复。`);
       if (!ok) return;
       hiddenCollections.add(currentCollection);
@@ -1488,6 +1671,7 @@
       const expected = nextChar();
       const ok = typed === expected;
       markPressed(typed, ok);
+      if (!startTime) startTime = Date.now();
 
       if (ok) {
         position += 1;
@@ -1495,7 +1679,7 @@
         clickSound(true);
         if (position === target.length) {
           updateUi();
-          showToast("完成！按 Esc 再练一遍。");
+          showCompletionToast();
           return;
         }
       } else {
@@ -1506,10 +1690,19 @@
       updateUi();
     }
 
+    function showCompletionToast() {
+      const total = right + wrong;
+      const accuracy = total ? Math.round((right / total) * 100) : 100;
+      const seconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+      const kpm = Math.round((right / seconds) * 60);
+      const advice = accuracy >= 95 ? "建议进入下一关。" : "建议再练一遍。";
+      showToast(`完成！正确率 ${accuracy}%｜用时 ${seconds}s｜${kpm} 键/分。${advice}`, 5200);
+    }
+
     function restoreHiddenCollections() {
       hiddenCollections = new Set();
       saveHiddenCollections();
-      refreshArticles(null, "basic");
+      refreshArticles(null, "fingering");
       reset();
       showToast("已恢复所有默认栏目。");
     }

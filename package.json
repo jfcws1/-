@@ -1,7 +1,7 @@
 {
-  "name": "typing-software",
+  "name": "jiandao",
   "version": "1.0.0",
-  "description": "打字侠风格的本地打字练习软件",
+  "description": "键道，本地中文打字练习软件",
   "main": "main.js",
   "private": true,
   "scripts": {

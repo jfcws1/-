@@ -9,7 +9,8 @@ function createWindow() {
     minHeight: 620,
     autoHideMenuBar: true,
     backgroundColor: '#f8fafc',
-    title: '打字侠',
+    icon: path.join(__dirname, 'icons', 'jiandao-icon.ico'),
+    title: '键道',
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,

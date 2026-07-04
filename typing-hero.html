@@ -400,9 +400,9 @@
     .hands {
       position: absolute;
       left: 50%;
-      top: 108px;
-      width: min(900px, calc(100vw - 110px));
-      height: 420px;
+      top: 54px;
+      width: min(984px, calc(100vw - 64px));
+      height: 320px;
       transform: translateX(-50%);
       pointer-events: none;
       z-index: 3;
@@ -417,89 +417,86 @@
 
     .finger {
       position: absolute;
-      width: 68px;
-      height: 250px;
-      border: 5px solid rgba(116, 120, 124, .72);
-      border-bottom-color: transparent;
-      border-radius: 46px 46px 28px 28px;
+      width: 36px;
+      height: 46px;
+      border: 3px solid rgba(105, 111, 120, .5);
+      border-radius: 18px 18px 22px 22px;
+      background: radial-gradient(circle at 50% 24%, rgba(255, 255, 255, .62), rgba(128, 134, 143, .24) 62%, rgba(128, 134, 143, .12));
+      box-shadow: inset 0 -8px 12px rgba(105, 111, 120, .13), 0 8px 18px rgba(80, 88, 100, .1);
       transform-origin: 50% 0;
-      opacity: .88;
-      transition: border-color .12s ease, transform .12s ease, opacity .12s ease;
+      opacity: .72;
+      transition: border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease, background .12s ease;
     }
 
     .finger::after {
       content: "";
       position: absolute;
       left: 50%;
-      top: -12px;
-      width: 22px;
-      height: 22px;
+      top: 7px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       transform: translateX(-50%);
-      background: rgba(116, 120, 124, .2);
-      border: 3px solid rgba(116, 120, 124, .55);
+      background: rgba(255, 255, 255, .54);
+      border: 1px solid rgba(105, 111, 120, .28);
     }
 
-    .finger.left.little { left: 70px; top: 92px; transform: rotate(16deg); }
-    .finger.left.ring { left: 142px; top: 85px; transform: rotate(13deg); }
-    .finger.left.middle { left: 222px; top: 82px; transform: rotate(10deg); }
-    .finger.left.index { left: 308px; top: 86px; transform: rotate(8deg); height: 300px; }
-    .finger.right.index { right: 308px; top: 86px; transform: rotate(-8deg); height: 300px; }
-    .finger.right.middle { right: 222px; top: 82px; transform: rotate(-10deg); }
-    .finger.right.ring { right: 142px; top: 85px; transform: rotate(-13deg); }
-    .finger.right.little { right: 70px; top: 92px; transform: rotate(-16deg); }
+    .finger.left.little { left: 136px; top: 116px; transform: rotate(8deg); }
+    .finger.left.ring { left: 204px; top: 110px; transform: rotate(5deg); }
+    .finger.left.middle { left: 272px; top: 106px; transform: rotate(2deg); }
+    .finger.left.index { left: 340px; top: 112px; transform: rotate(-1deg); }
+    .finger.right.index { right: 402px; top: 112px; transform: rotate(1deg); }
+    .finger.right.middle { right: 337px; top: 106px; transform: rotate(-2deg); }
+    .finger.right.ring { right: 272px; top: 110px; transform: rotate(-5deg); }
+    .finger.right.little { right: 207px; top: 116px; transform: rotate(-8deg); }
 
     .thumb {
       position: absolute;
-      top: 192px;
-      width: 126px;
-      height: 190px;
-      border: 5px solid rgba(116, 120, 124, .72);
-      border-top-color: transparent;
-      border-radius: 30px 30px 80px 80px;
-      opacity: .88;
-      transition: border-color .12s ease, transform .12s ease;
+      top: 238px;
+      width: 84px;
+      height: 34px;
+      border: 3px solid rgba(105, 111, 120, .48);
+      border-radius: 999px;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, .6), rgba(128, 134, 143, .22) 68%, rgba(128, 134, 143, .1));
+      opacity: .7;
+      transition: border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease;
     }
 
     .thumb::after {
       content: "";
       position: absolute;
       left: 50%;
-      top: 6px;
-      width: 22px;
-      height: 22px;
+      top: 9px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       transform: translateX(-50%);
-      background: rgba(116, 120, 124, .2);
-      border: 3px solid rgba(116, 120, 124, .55);
+      background: rgba(255, 255, 255, .5);
+      border: 1px solid rgba(105, 111, 120, .28);
     }
 
     .thumb.left {
-      left: 352px;
-      transform: rotate(-20deg);
+      left: 365px;
+      transform: rotate(-9deg);
     }
 
     .thumb.right {
-      right: 352px;
-      transform: rotate(20deg);
+      right: 365px;
+      transform: rotate(9deg);
     }
 
     .finger.active,
     .thumb.active {
-      border-color: rgba(52, 112, 220, .92);
-      border-bottom-color: transparent;
+      border-color: rgba(52, 112, 220, .96);
       opacity: 1;
+      background: radial-gradient(circle at 50% 22%, rgba(255, 255, 255, .74), rgba(95, 157, 242, .34) 62%, rgba(95, 157, 242, .2));
+      box-shadow: 0 0 0 8px rgba(52, 112, 220, .12), 0 8px 20px rgba(52, 112, 220, .22);
     }
 
     .finger.active::after,
     .thumb.active::after {
       background: rgba(52, 112, 220, .22);
       border-color: rgba(52, 112, 220, .95);
-      box-shadow: 0 0 0 8px rgba(52, 112, 220, .12);
-    }
-
-    .thumb.active {
-      border-top-color: transparent;
     }
 
     .toast {

@@ -14,6 +14,20 @@ $html = Join-Path $appDir 'typing-hero.html'
 $profile = Join-Path $appDir '.edge-profile-typing'
 $url = [System.Uri]::new((Resolve-Path $html).Path).AbsoluteUri
 
+$profileMarker = [Regex]::Escape($profile)
+$running = Get-CimInstance Win32_Process -Filter "Name = 'msedge.exe'" |
+  Where-Object { $_.CommandLine -match $profileMarker -and $_.CommandLine -match '--app=' }
+
+if ($running) {
+  try {
+    $shell = New-Object -ComObject WScript.Shell
+    $null = $shell.AppActivate('键道')
+  } catch {
+    # If focusing fails, keep the existing single window and avoid opening another.
+  }
+  exit 0
+}
+
 Start-Process -FilePath $edge -ArgumentList @(
   '--app=' + $url,
   '--user-data-dir=' + $profile,

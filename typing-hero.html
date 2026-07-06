@@ -616,23 +616,24 @@
       height: 30px;
     }
 
-    .trainer.hand-full .finger.left.little { left: 54px; top: 106px; }
-    .trainer.hand-full .finger.left.ring { left: 132px; top: 96px; }
-    .trainer.hand-full .finger.left.middle { left: 214px; top: 88px; }
-    .trainer.hand-full .finger.left.index { left: 300px; top: 98px; }
-    .trainer.hand-full .finger.right.index { right: 300px; top: 98px; }
-    .trainer.hand-full .finger.right.middle { right: 214px; top: 88px; }
-    .trainer.hand-full .finger.right.ring { right: 132px; top: 96px; }
-    .trainer.hand-full .finger.right.little { right: 54px; top: 106px; }
+    .trainer.hand-full .finger {
+      left: calc(var(--home-x) - 29px);
+      top: calc(var(--home-y) - 18px);
+      right: auto;
+      transform: none;
+    }
 
     .trainer.hand-full .thumb.left {
-      left: 356px;
-      transform: rotate(-18deg);
+      left: calc(var(--home-x) - 48px);
+      top: calc(var(--home-y) - 26px);
+      transform: none;
     }
 
     .trainer.hand-full .thumb.right {
-      right: 356px;
-      transform: rotate(18deg);
+      left: calc(var(--home-x) - 48px);
+      top: calc(var(--home-y) - 26px);
+      right: auto;
+      transform: none;
     }
 
     .trainer.hand-full .finger.active,

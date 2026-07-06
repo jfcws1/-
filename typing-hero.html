@@ -456,8 +456,12 @@
     }
 
     .key.pressed {
+      z-index: 3;
       transform: translateY(2px);
-      background: linear-gradient(#d7eaff, #b7d7fb);
+      background: linear-gradient(#72d99d, #38ba73);
+      border-color: #23945a;
+      color: #fff;
+      box-shadow: 0 0 0 6px rgba(47, 181, 111, .2), inset 0 -2px 0 rgba(0, 0, 0, .12);
     }
 
     .key.wrong {
@@ -498,7 +502,7 @@
       box-shadow: none;
       transform-origin: 50% 0;
       opacity: 0;
-      transition: border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease, background .12s ease;
+      transition: left .14s ease, top .14s ease, border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease, background .12s ease;
     }
 
     .finger::after {
@@ -533,7 +537,7 @@
       border-radius: 50%;
       background: transparent;
       opacity: 0;
-      transition: border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease;
+      transition: left .14s ease, top .14s ease, border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease;
     }
 
     .thumb::after {
@@ -641,6 +645,19 @@
       opacity: .9;
       border-color: rgba(52, 112, 220, .78);
       background: rgba(111, 167, 242, .08);
+    }
+
+    .trainer.hand-full .finger.active {
+      left: calc(var(--press-x) - 29px);
+      top: calc(var(--press-y) - 18px);
+      transform: translateY(-4px);
+    }
+
+    .trainer.hand-full .thumb.active {
+      left: calc(var(--press-x) - 48px);
+      top: calc(var(--press-y) - 26px);
+      right: auto;
+      transform: translateY(-3px);
     }
 
     .finger.active::after,
@@ -1820,7 +1837,7 @@
       const targetKey = [...document.querySelectorAll(".key")].find(item => matchesKey(item.dataset.key, key));
       if (!targetKey) return;
       targetKey.classList.add(ok ? "pressed" : "wrong");
-      window.setTimeout(() => targetKey.classList.remove("pressed", "wrong"), 120);
+      window.setTimeout(() => targetKey.classList.remove("pressed", "wrong"), ok ? 220 : 180);
     }
 
     function showToast(text, duration = 1800) {

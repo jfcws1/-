@@ -565,6 +565,14 @@
       opacity: 1;
     }
 
+    .trainer:not(.hand-full) .finger.active,
+    .trainer:not(.hand-full) .thumb.active {
+      left: var(--press-x);
+      top: var(--press-y);
+      right: auto;
+      transform: translate(-50%, -50%);
+    }
+
     .trainer.hand-full .finger {
       width: 58px;
       height: 230px;
@@ -1647,6 +1655,7 @@
       document.querySelectorAll("[data-finger]").forEach(finger => {
         finger.classList.toggle("active", finger.dataset.finger === fingerMap[next]);
       });
+      syncHandPrompt(next);
 
       document.querySelectorAll(".syllable").forEach(item => {
         const start = Number(item.dataset.start);
@@ -1681,6 +1690,30 @@
       if (!key) return false;
       if (key === " " && id === " ") return true;
       return id.toLowerCase() === (shiftedKeyMap[key] || key);
+    }
+
+    function syncHandPrompt(key) {
+      const handsEl = document.querySelector(".hands");
+      if (!handsEl) return;
+
+      const trainerRect = trainerEl.getBoundingClientRect();
+      const keyboardRect = keyboardEl.getBoundingClientRect();
+      handsEl.style.left = `${keyboardRect.left - trainerRect.left}px`;
+      handsEl.style.top = `${keyboardRect.top - trainerRect.top}px`;
+      handsEl.style.width = `${keyboardRect.width}px`;
+      handsEl.style.height = `${keyboardRect.height}px`;
+      handsEl.style.transform = "none";
+
+      const targetKey = Array.from(keyboardEl.querySelectorAll(".key")).find(item => matchesKey(item.dataset.key, key));
+      if (!targetKey) return;
+
+      const keyRect = targetKey.getBoundingClientRect();
+      const x = keyRect.left - keyboardRect.left + keyRect.width / 2;
+      const y = keyRect.top - keyboardRect.top + keyRect.height / 2;
+      document.querySelectorAll("[data-finger]").forEach(finger => {
+        finger.style.setProperty("--press-x", `${x}px`);
+        finger.style.setProperty("--press-y", `${y}px`);
+      });
     }
 
     function initAudio() {
@@ -2096,6 +2129,7 @@
     document.addEventListener("pointerdown", () => inputEl.focus());
     document.addEventListener("fullscreenchange", updateControls);
     window.addEventListener("load", () => inputEl.focus());
+    window.addEventListener("resize", () => syncHandPrompt(nextChar()));
     pauseBtn.addEventListener("click", togglePause);
     restartBtn.addEventListener("click", reset);
     soundToggleBtn.addEventListener("click", toggleSound);

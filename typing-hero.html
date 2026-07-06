@@ -58,6 +58,39 @@
       font-size: 14px;
     }
 
+    .practice-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 12px;
+    }
+
+    .tool-btn {
+      height: 30px;
+      min-width: 52px;
+      padding: 0 10px;
+      border: 1px solid #cbd2dc;
+      border-radius: 7px;
+      background: linear-gradient(#fff, #f3f6fa);
+      color: #566170;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: inset 0 -1px 0 rgba(25, 33, 45, .04);
+    }
+
+    .tool-btn:hover {
+      border-color: #9fb6d6;
+      color: #386fb8;
+    }
+
+    .tool-btn.active {
+      border-color: #5c94de;
+      background: #e6f1ff;
+      color: #276cd4;
+      font-weight: 650;
+    }
+
     .article-tools select,
     .article-tools button,
     .editor input[type="file"],
@@ -199,6 +232,13 @@
       transform: translateY(-2px);
     }
 
+    .syllable.active .pinyin {
+      color: #3575de;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, .72);
+      box-shadow: inset 0 -5px 0 rgba(79, 142, 233, .22);
+      border-radius: 6px;
+    }
+
     .pinyin {
       display: block;
       min-width: 100%;
@@ -246,11 +286,22 @@
       min-width: .72em;
       height: 1.12em;
       margin: 0 .05em;
+      position: relative;
       color: #3575de;
-      background: rgba(111, 167, 242, .16);
-      border-radius: 6px;
       line-height: 1;
       vertical-align: -.05em;
+    }
+
+    .article-text .current-char::after {
+      content: "";
+      position: absolute;
+      left: .12em;
+      right: .12em;
+      bottom: -.08em;
+      height: 5px;
+      border-radius: 999px;
+      background: #3575de;
+      box-shadow: 0 4px 12px rgba(53, 117, 222, .18);
     }
 
     .syllable.done .pinyin,
@@ -292,6 +343,44 @@
       display: flex;
       gap: 18px;
       white-space: nowrap;
+    }
+
+    .side-stats {
+      position: absolute;
+      top: 62px;
+      right: max(18px, calc((100vw - 984px) / 2 - 150px));
+      width: 124px;
+      display: grid;
+      gap: 10px;
+      color: #6d7682;
+      z-index: 4;
+    }
+
+    .side-stat {
+      padding: 8px 10px;
+      border: 1px solid #dde3ec;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .78);
+      box-shadow: 0 10px 24px rgba(48, 58, 74, .07);
+      backdrop-filter: blur(6px);
+    }
+
+    .side-stat span {
+      display: block;
+      font-size: 12px;
+      color: #8a929d;
+    }
+
+    .side-stat strong {
+      display: block;
+      margin-top: 2px;
+      color: #3a4450;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .trainer.paused .keyboard {
+      opacity: .68;
     }
 
     .keyboard {
@@ -395,6 +484,10 @@
       opacity: .72;
     }
 
+    .trainer.hand-full.show-hands .hands {
+      opacity: .5;
+    }
+
     .finger {
       position: absolute;
       width: 36px;
@@ -470,6 +563,66 @@
     .finger.active,
     .thumb.active {
       opacity: 1;
+    }
+
+    .trainer.hand-full .finger {
+      width: 58px;
+      height: 230px;
+      border: 4px solid rgba(105, 112, 122, .28);
+      border-bottom-color: rgba(105, 112, 122, .1);
+      border-radius: 999px 999px 42px 42px;
+      background: rgba(255, 255, 255, .08);
+      opacity: .48;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .5);
+    }
+
+    .trainer.hand-full .finger::after {
+      top: 18px;
+      width: 28px;
+      height: 28px;
+    }
+
+    .trainer.hand-full .thumb {
+      top: 228px;
+      width: 96px;
+      height: 92px;
+      border: 4px solid rgba(105, 112, 122, .24);
+      border-top-color: rgba(105, 112, 122, .08);
+      border-radius: 46px;
+      background: rgba(255, 255, 255, .08);
+      opacity: .42;
+    }
+
+    .trainer.hand-full .thumb::after {
+      top: 26px;
+      width: 30px;
+      height: 30px;
+    }
+
+    .trainer.hand-full .finger.left.little { left: 54px; top: 106px; }
+    .trainer.hand-full .finger.left.ring { left: 132px; top: 96px; }
+    .trainer.hand-full .finger.left.middle { left: 214px; top: 88px; }
+    .trainer.hand-full .finger.left.index { left: 300px; top: 98px; }
+    .trainer.hand-full .finger.right.index { right: 300px; top: 98px; }
+    .trainer.hand-full .finger.right.middle { right: 214px; top: 88px; }
+    .trainer.hand-full .finger.right.ring { right: 132px; top: 96px; }
+    .trainer.hand-full .finger.right.little { right: 54px; top: 106px; }
+
+    .trainer.hand-full .thumb.left {
+      left: 356px;
+      transform: rotate(-18deg);
+    }
+
+    .trainer.hand-full .thumb.right {
+      right: 356px;
+      transform: rotate(18deg);
+    }
+
+    .trainer.hand-full .finger.active,
+    .trainer.hand-full .thumb.active {
+      opacity: .9;
+      border-color: rgba(52, 112, 220, .78);
+      background: rgba(111, 167, 242, .08);
     }
 
     .finger.active::after,
@@ -586,9 +739,36 @@
       margin-top: 14px;
     }
 
+    @media (max-width: 1320px) {
+      .side-stats {
+        position: static;
+        width: min(984px, calc(100vw - 64px));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin: 4px 0 8px;
+      }
+
+      .side-stat {
+        padding: 6px 10px;
+      }
+
+      .side-stat strong {
+        font-size: 19px;
+      }
+
+      .hands {
+        top: 120px;
+      }
+    }
+
     @media (max-width: 760px) {
       .app {
         grid-template-rows: 42px minmax(220px, 40vh) 1fr;
+      }
+
+      .titlebar {
+        gap: 6px;
+        padding: 0 8px;
       }
 
       .lesson {
@@ -613,6 +793,17 @@
         gap: 5px;
       }
 
+      .practice-controls {
+        gap: 4px;
+        margin-left: 4px;
+      }
+
+      .tool-btn {
+        min-width: 42px;
+        padding: 0 6px;
+        font-size: 12px;
+      }
+
       .article-tools select {
         width: 140px;
       }
@@ -624,6 +815,19 @@
       .hud,
       .keyboard {
         width: calc(100vw - 20px);
+      }
+
+      .side-stats {
+        width: calc(100vw - 20px);
+        gap: 6px;
+      }
+
+      .side-stat {
+        padding: 5px 8px;
+      }
+
+      .side-stat strong {
+        font-size: 18px;
       }
 
       .key {
@@ -646,6 +850,13 @@
     <header class="titlebar">
       <div class="logo">键</div>
       <div>键道</div>
+      <div class="practice-controls" aria-label="练习控制">
+        <button class="tool-btn" id="pauseBtn" type="button">暂停</button>
+        <button class="tool-btn" id="restartBtn" type="button">重来</button>
+        <button class="tool-btn active" id="soundToggleBtn" type="button">音效 开</button>
+        <button class="tool-btn" id="handModeBtn" type="button">指尖</button>
+        <button class="tool-btn" id="fullscreenBtn" type="button">全屏</button>
+      </div>
       <div class="article-tools">
         <select class="collection-select" id="collectionSelect" aria-label="选择栏目"></select>
         <select id="articleSelect" aria-label="选择练习文章"></select>
@@ -673,6 +884,12 @@
           <span>进度 <strong id="progressText">0%</strong></span>
         </div>
       </div>
+
+      <aside class="side-stats" aria-label="实时统计">
+        <div class="side-stat"><span>速度</span><strong id="speedText">0</strong></div>
+        <div class="side-stat"><span>准确率</span><strong id="accuracyText">100%</strong></div>
+        <div class="side-stat"><span>用时</span><strong id="elapsedText">00:00</strong></div>
+      </aside>
 
       <div class="keyboard" id="keyboard"></div>
 
@@ -982,8 +1199,16 @@
     const rightCountEl = document.getElementById("rightCount");
     const wrongCountEl = document.getElementById("wrongCount");
     const progressTextEl = document.getElementById("progressText");
+    const speedTextEl = document.getElementById("speedText");
+    const accuracyTextEl = document.getElementById("accuracyText");
+    const elapsedTextEl = document.getElementById("elapsedText");
     const toastEl = document.getElementById("toast");
     const inputEl = document.getElementById("typingInput");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const soundToggleBtn = document.getElementById("soundToggleBtn");
+    const handModeBtn = document.getElementById("handModeBtn");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
     const collectionSelectEl = document.getElementById("collectionSelect");
     const articleSelectEl = document.getElementById("articleSelect");
     const addArticleBtn = document.getElementById("addArticleBtn");
@@ -1002,6 +1227,8 @@
 
     const storageKey = "typingHeroCustomArticles";
     const hiddenCollectionsKey = "typingHeroHiddenCollections";
+    const soundStorageKey = "typingHeroSoundEnabled";
+    const handModeStorageKey = "typingHeroHandMode";
     let customArticles = loadCustomArticles();
     let hiddenCollections = loadHiddenCollections();
     let currentCollection = "fingering";
@@ -1016,6 +1243,11 @@
     let noiseBuffer;
     let toastTimer;
     let startTime = 0;
+    let paused = false;
+    let pausedAt = 0;
+    let pausedDuration = 0;
+    let soundEnabled = localStorage.getItem(soundStorageKey) !== "off";
+    let handMode = localStorage.getItem(handModeStorageKey) === "full" ? "full" : "simple";
 
     function loadCustomArticles() {
       try {
@@ -1359,14 +1591,53 @@
       return key;
     }
 
+    function activeElapsedMs() {
+      if (!startTime) return 0;
+      const pausedNow = paused && pausedAt ? Date.now() - pausedAt : 0;
+      return Math.max(0, Date.now() - startTime - pausedDuration - pausedNow);
+    }
+
+    function formatElapsed(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+      const seconds = String(totalSeconds % 60).padStart(2, "0");
+      return `${minutes}:${seconds}`;
+    }
+
+    function updateRuntimeStats() {
+      const total = right + wrong;
+      const seconds = Math.max(1, activeElapsedMs() / 1000);
+      const speed = startTime ? Math.round((right / seconds) * 60) : 0;
+      const accuracy = total ? Math.round((right / total) * 100) : 100;
+      speedTextEl.textContent = speed;
+      accuracyTextEl.textContent = `${accuracy}%`;
+      elapsedTextEl.textContent = formatElapsed(activeElapsedMs());
+      return { accuracy, seconds, speed };
+    }
+
+    function updateControls() {
+      pauseBtn.textContent = paused ? "继续" : "暂停";
+      pauseBtn.classList.toggle("active", paused);
+      soundToggleBtn.textContent = soundEnabled ? "音效 开" : "音效 关";
+      soundToggleBtn.classList.toggle("active", soundEnabled);
+      handModeBtn.textContent = handMode === "full" ? "整手" : "指尖";
+      handModeBtn.classList.toggle("active", handMode === "full");
+      fullscreenBtn.textContent = document.fullscreenElement ? "退出" : "全屏";
+      fullscreenBtn.classList.toggle("active", Boolean(document.fullscreenElement));
+      trainerEl.classList.toggle("paused", paused);
+      trainerEl.classList.toggle("hand-full", handMode === "full");
+    }
+
     function updateUi() {
       const next = nextChar();
       trainerEl.classList.toggle("show-hands", currentCollection === "fingering");
+      updateControls();
       nextKeyEl.textContent = next ? keyLabel(next) : "完成";
       rightCountEl.textContent = right;
       wrongCountEl.textContent = wrong;
       const progress = target.length ? Math.round((position / target.length) * 100) : 0;
       progressTextEl.textContent = `${progress}%`;
+      updateRuntimeStats();
 
       document.querySelectorAll(".key").forEach(key => {
         key.classList.remove("next", "wrong");
@@ -1425,6 +1696,7 @@
     }
 
     function clickSound(ok) {
+      if (!soundEnabled) return;
       initAudio();
       const now = audioContext.currentTime;
       const noise = audioContext.createBufferSource();
@@ -1485,9 +1757,54 @@
       right = 0;
       wrong = 0;
       startTime = 0;
+      paused = false;
+      pausedAt = 0;
+      pausedDuration = 0;
       renderPhrase();
       updateUi();
       showToast("已重新开始。");
+    }
+
+    function togglePause() {
+      if (position >= target.length) return;
+      if (!paused) {
+        paused = true;
+        pausedAt = Date.now();
+        showToast("已暂停，点击继续后恢复练习。");
+      } else {
+        paused = false;
+        if (pausedAt) pausedDuration += Date.now() - pausedAt;
+        pausedAt = 0;
+        showToast("继续输入。");
+        inputEl.focus();
+      }
+      updateUi();
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem(soundStorageKey, soundEnabled ? "on" : "off");
+      updateControls();
+      showToast(soundEnabled ? "音效已开启。" : "音效已关闭。");
+      if (soundEnabled) clickSound(true);
+      inputEl.focus();
+    }
+
+    function toggleHandMode() {
+      handMode = handMode === "full" ? "simple" : "full";
+      localStorage.setItem(handModeStorageKey, handMode);
+      updateUi();
+      showToast(handMode === "full" ? "已切换为整手提示。" : "已切换为指尖提示。");
+      inputEl.focus();
+    }
+
+    function toggleFullscreen() {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.getElementById("app").requestFullscreen();
+      }
+      inputEl.focus();
     }
 
     function selectArticle(id) {
@@ -1715,6 +2032,11 @@
         reset();
         return;
       }
+      if (paused) {
+        event.preventDefault();
+        showToast("已暂停，点击继续后再输入。");
+        return;
+      }
       if (event.key === " " && isPagedCollection()) {
         event.preventDefault();
         selectNextArticle();
@@ -1756,7 +2078,7 @@
     function showCompletionToast() {
       const total = right + wrong;
       const accuracy = total ? Math.round((right / total) * 100) : 100;
-      const seconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+      const seconds = Math.max(1, Math.round(activeElapsedMs() / 1000));
       const kpm = Math.round((right / seconds) * 60);
       const advice = accuracy >= 95 ? "建议进入下一关。" : "建议再练一遍。";
       showToast(`完成！正确率 ${accuracy}%｜用时 ${seconds}s｜${kpm} 键/分。${advice}`, 5200);
@@ -1772,7 +2094,13 @@
 
     document.addEventListener("keydown", handleKeydown);
     document.addEventListener("pointerdown", () => inputEl.focus());
+    document.addEventListener("fullscreenchange", updateControls);
     window.addEventListener("load", () => inputEl.focus());
+    pauseBtn.addEventListener("click", togglePause);
+    restartBtn.addEventListener("click", reset);
+    soundToggleBtn.addEventListener("click", toggleSound);
+    handModeBtn.addEventListener("click", toggleHandMode);
+    fullscreenBtn.addEventListener("click", toggleFullscreen);
     collectionSelectEl.addEventListener("change", () => selectCollection(collectionSelectEl.value));
     articleSelectEl.addEventListener("change", () => selectArticle(articleSelectEl.value));
     addArticleBtn.addEventListener("click", openEditor);
@@ -1793,6 +2121,7 @@
     renderPhrase();
     renderKeyboard();
     updateUi();
+    window.setInterval(updateRuntimeStats, 1000);
   </script>
 </body>
 </html>

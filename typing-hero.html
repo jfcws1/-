@@ -560,6 +560,15 @@
       transform: rotate(9deg);
     }
 
+    .trainer:not(.hand-full) .finger,
+    .trainer:not(.hand-full) .thumb {
+      left: var(--home-x);
+      top: var(--home-y);
+      right: auto;
+      transform: translate(-50%, -50%);
+      opacity: .42;
+    }
+
     .finger.active,
     .thumb.active {
       opacity: 1;
@@ -1190,6 +1199,19 @@
       " ": "right-thumb"
     };
 
+    const homeKeyMap = {
+      "left-little": "a",
+      "left-ring": "s",
+      "left-middle": "d",
+      "left-index": "f",
+      "right-index": "j",
+      "right-middle": "k",
+      "right-ring": "l",
+      "right-little": ";",
+      "left-thumb": " ",
+      "right-thumb": " "
+    };
+
     const shiftedKeyMap = {
       "~": "`", "!": "1", "@": "2", "#": "3", "$": "4", "%": "5", "^": "6",
       "&": "7", "*": "8", "(": "9", ")": "0", "_": "-", "+": "=",
@@ -1653,7 +1675,8 @@
       });
 
       document.querySelectorAll("[data-finger]").forEach(finger => {
-        finger.classList.toggle("active", finger.dataset.finger === fingerMap[next]);
+        const isSpaceThumb = next === " " && finger.dataset.finger.endsWith("-thumb");
+        finger.classList.toggle("active", finger.dataset.finger === fingerMap[next] || isSpaceThumb);
       });
       syncHandPrompt(next);
 
@@ -1704,15 +1727,35 @@
       handsEl.style.height = `${keyboardRect.height}px`;
       handsEl.style.transform = "none";
 
-      const targetKey = Array.from(keyboardEl.querySelectorAll(".key")).find(item => matchesKey(item.dataset.key, key));
+      const keys = Array.from(keyboardEl.querySelectorAll(".key"));
+      const keyCenter = (keyValue, fingerName = "") => {
+        const item = keys.find(keyItem => matchesKey(keyItem.dataset.key, keyValue));
+        if (!item) return null;
+        const rect = item.getBoundingClientRect();
+        let x = rect.left - keyboardRect.left + rect.width / 2;
+        if (keyValue === " " && fingerName === "left-thumb") x = rect.left - keyboardRect.left + rect.width * .36;
+        if (keyValue === " " && fingerName === "right-thumb") x = rect.left - keyboardRect.left + rect.width * .64;
+        return {
+          x,
+          y: rect.top - keyboardRect.top + rect.height / 2
+        };
+      };
+
+      document.querySelectorAll("[data-finger]").forEach(finger => {
+        const home = keyCenter(homeKeyMap[finger.dataset.finger], finger.dataset.finger);
+        if (!home) return;
+        finger.style.setProperty("--home-x", `${home.x}px`);
+        finger.style.setProperty("--home-y", `${home.y}px`);
+      });
+
+      const targetKey = keys.find(item => matchesKey(item.dataset.key, key));
       if (!targetKey) return;
 
-      const keyRect = targetKey.getBoundingClientRect();
-      const x = keyRect.left - keyboardRect.left + keyRect.width / 2;
-      const y = keyRect.top - keyboardRect.top + keyRect.height / 2;
       document.querySelectorAll("[data-finger]").forEach(finger => {
-        finger.style.setProperty("--press-x", `${x}px`);
-        finger.style.setProperty("--press-y", `${y}px`);
+        const press = keyCenter(key, finger.dataset.finger);
+        if (!press) return;
+        finger.style.setProperty("--press-x", `${press.x}px`);
+        finger.style.setProperty("--press-y", `${press.y}px`);
       });
     }
 

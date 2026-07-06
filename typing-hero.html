@@ -1345,8 +1345,8 @@
 
     function articleTarget(article) {
       if (article.target) return article.target.toLowerCase();
-      if (article.units) return buildTargetFromUnits(article.units).toLowerCase();
       if (article.display) return generatedTargetFor(article.display);
+      if (article.units) return buildTargetFromUnits(article.units).toLowerCase();
       return "";
     }
 
@@ -1409,7 +1409,7 @@
       renderCollectionOptions();
       renderArticleOptions();
       articleSelectEl.value = currentArticle.id;
-      lesson = currentArticle.units || (currentArticle.display && !currentArticle.target ? textToUnits(currentArticle.display) : []);
+      lesson = currentArticle.display ? textToUnits(currentArticle.display) : (currentArticle.units || []);
       target = articleTarget(currentArticle);
       updateLessonMeta();
       updateDeleteButton();
@@ -1514,6 +1514,21 @@
       return pinyinDict[char] || char;
     }
 
+    function pinyinDataForText(text, toneType = "none") {
+      const api = pinyinApi();
+      if (!api) return [];
+      try {
+        return api(text, {
+          type: "all",
+          toneType,
+          nonZh: "consecutive",
+          v: true
+        }).filter(item => item && item.isZh);
+      } catch {
+        return [];
+      }
+    }
+
     function charToTypingUnit(char) {
       if (char === "\r") return null;
       if (char === "\n") return { py: " ", hz: " ", show: "空" };
@@ -1533,7 +1548,20 @@
     }
 
     function textToUnits(text) {
-      return [...text].map(charToTypingUnit).filter(Boolean);
+      const plainPinyin = pinyinDataForText(text, "none");
+      const tonePinyin = pinyinDataForText(text, "symbol");
+      let zhIndex = 0;
+
+      return [...text].map(char => {
+        if (!isChineseChar(char)) return charToTypingUnit(char);
+        const plain = plainPinyin[zhIndex];
+        const toned = tonePinyin[zhIndex];
+        zhIndex += 1;
+
+        const py = plain && plain.pinyin ? plain.pinyin : pinyinForChar(char, "none");
+        const show = toned && toned.pinyin ? toned.pinyin : pinyinForChar(char, "symbol");
+        return { py, hz: char, show, unknown: py === char };
+      }).filter(Boolean);
     }
 
     function generatedTargetFor(text) {
@@ -1779,6 +1807,29 @@
       });
     }
 
+    function syncToastPlacement() {
+      const keyboardRect = keyboardEl.getBoundingClientRect();
+      const statsRect = document.querySelector(".side-stats").getBoundingClientRect();
+      const trainerRect = trainerEl.getBoundingClientRect();
+      const sideBySide = statsRect.left >= keyboardRect.right + 12;
+
+      if (!sideBySide) {
+        toastEl.style.left = "";
+        toastEl.style.right = "";
+        toastEl.style.top = "";
+        toastEl.style.bottom = "";
+        toastEl.style.maxWidth = "";
+        return;
+      }
+
+      const toastRect = toastEl.getBoundingClientRect();
+      toastEl.style.left = `${statsRect.left - trainerRect.left}px`;
+      toastEl.style.right = "auto";
+      toastEl.style.top = `${keyboardRect.bottom - trainerRect.top - toastRect.height}px`;
+      toastEl.style.bottom = "auto";
+      toastEl.style.maxWidth = `${Math.max(180, statsRect.width)}px`;
+    }
+
     function initAudio() {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -1842,9 +1893,11 @@
 
     function showToast(text, duration = 1800) {
       toastEl.textContent = text;
+      window.requestAnimationFrame(syncToastPlacement);
       window.clearTimeout(toastTimer);
       toastTimer = window.setTimeout(() => {
         toastEl.textContent = "继续输入，按 Esc 可重新开始。";
+        window.requestAnimationFrame(syncToastPlacement);
       }, duration);
     }
 
@@ -1918,7 +1971,7 @@
 
     function showArticleToast(prefix = "已切换到") {
       const author = currentArticle.author ? ` / ${currentArticle.author}` : "";
-      const hint = isPagedCollection() ? "按空格切换下一篇。" : "按 Esc 可重新开始。";
+      const hint = isPagedCollection() ? "按 Enter 切换下一篇，空格也可切换。" : "按 Esc 可重新开始。";
       showToast(`${prefix}《${currentArticle.title}${author}》。${hint}`);
     }
 
@@ -2134,7 +2187,7 @@
         showToast("已暂停，点击继续后再输入。");
         return;
       }
-      if (event.key === " " && isPagedCollection()) {
+      if ((event.key === "Enter" || event.key === " ") && isPagedCollection()) {
         event.preventDefault();
         selectNextArticle();
         return;
@@ -2200,7 +2253,10 @@
     document.addEventListener("pointerdown", () => inputEl.focus());
     document.addEventListener("fullscreenchange", updateControls);
     window.addEventListener("load", () => inputEl.focus());
-    window.addEventListener("resize", () => syncHandPrompt(nextChar()));
+    window.addEventListener("resize", () => {
+      syncHandPrompt(nextChar());
+      syncToastPlacement();
+    });
     pauseBtn.addEventListener("click", togglePause);
     restartBtn.addEventListener("click", reset);
     soundToggleBtn.addEventListener("click", toggleSound);
@@ -2226,6 +2282,7 @@
     renderPhrase();
     renderKeyboard();
     updateUi();
+    syncToastPlacement();
     window.setInterval(updateRuntimeStats, 1000);
   </script>
 </body>

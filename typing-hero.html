@@ -184,8 +184,27 @@
       align-content: flex-start;
       gap: 8px 14px;
       padding-top: 12px;
-      max-width: 1100px;
+      width: 100%;
+      max-width: none;
       padding-bottom: 18px;
+    }
+
+    .phrase.poem-phrase {
+      display: block;
+    }
+
+    .poem-line {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+      gap: 8px 12px;
+      margin-bottom: 8px;
+      width: max-content;
+      max-width: 100%;
+    }
+
+    .poem-line .syllable {
+      min-width: 56px;
     }
 
     .lesson-meta {
@@ -237,6 +256,30 @@
       text-shadow: 0 1px 0 rgba(255, 255, 255, .72);
       box-shadow: inset 0 -5px 0 rgba(79, 142, 233, .22);
       border-radius: 6px;
+    }
+
+    .phrase.practical-phrase .syllable .pinyin {
+      min-height: 44px;
+      color: #3575de;
+    }
+
+    .phrase.practical-phrase .syllable.pending .pinyin {
+      color: transparent;
+      box-shadow: none;
+    }
+
+    .phrase.practical-phrase .syllable.current .pinyin {
+      color: #3575de;
+      box-shadow: inset 0 -5px 0 rgba(79, 142, 233, .18);
+      border-radius: 6px;
+    }
+
+    .phrase.practical-phrase .syllable .hanzi {
+      color: #68707a;
+    }
+
+    .phrase.practical-phrase .syllable.done .pinyin {
+      color: #8b96a3;
     }
 
     .pinyin {
@@ -728,6 +771,14 @@
       font-size: 14px;
     }
 
+    .practical-category-field {
+      display: none;
+    }
+
+    .practical-category-field.open {
+      display: grid;
+    }
+
     .editor input,
     .editor textarea {
       width: 100%;
@@ -952,6 +1003,10 @@
       <label>
         文章名称
         <input id="articleTitleInput" maxlength="24" placeholder="例如：我的拼音练习">
+      </label>
+      <label class="practical-category-field" id="practicalCategoryField">
+        实战栏目
+        <input id="practicalCategoryInput" maxlength="24" placeholder="例如：编程标点、工作文档、常用句子">
       </label>
       <label>
         显示内容
@@ -1189,6 +1244,45 @@
         order: index
       }));
 
+    const zengguangTexts = [
+      "昔时贤文，诲汝谆谆。集韵增广，多见多闻。观今宜鉴古，无古不成今。知己知彼，将心比心。",
+      "酒逢知己饮，诗向会人吟。相识满天下，知心能几人。相逢好似初相识，到老终无怨恨心。",
+      "近水知鱼性，近山识鸟音。易涨易退山溪水，易反易覆小人心。运去金成铁，时来铁似金。",
+      "读书须用意，一字值千金。逢人且说三分话，未可全抛一片心。有意栽花花不发，无心插柳柳成阴。",
+      "画龙画虎难画骨，知人知面不知心。钱财如粪土，仁义值千金。流水下滩非有意，白云出岫本无心。",
+      "当时若不登高望，谁信东流海洋深。路遥知马力，事久见人心。两人一般心，有钱堪买金；一人一般心，无钱堪买针。",
+      "相见易得好，久住难为人。马行无力皆因瘦，人不风流只为贫。饶人不是痴汉，痴汉不会饶人。",
+      "是亲不是亲，非亲却是亲。美不美，乡中水；亲不亲，故乡人。莺花犹怕春光老，岂可教人枉度春。",
+      "黄金无假，阿魏无真。客来主不顾，应恐是痴人。贫居闹市无人问，富在深山有远亲。",
+      "谁人背后无人说，哪个人前不说人。有钱道真语，无钱语不真。不信但看筵中酒，杯杯先劝有钱人。",
+      "闹里有钱，静处安身。来如风雨，去似微尘。长江后浪推前浪，世上新人赶旧人。",
+      "近水楼台先得月，向阳花木早逢春。古人不见今时月，今月曾经照古人。先到为君，后到为臣。",
+      "莫道君行早，更有早行人。莫信直中直，须防仁不仁。山中有直树，世上无直人。",
+      "自恨枝无叶，莫怨太阳偏。大家都是命，半点不由人。一年之计在于春，一日之计在于寅。",
+      "一家之计在于和，一生之计在于勤。责人之心责己，恕己之心恕人。守口如瓶，防意如城。",
+      "宁可人负我，切莫我负人。再三须慎意，第一莫欺心。虎生犹可近，人熟不堪亲。",
+      "来说是非者，便是是非人。远水难救近火，远亲不如近邻。有茶有酒多兄弟，急难何曾见一人。",
+      "人情似纸张张薄，世事如棋局局新。山中也有千年树，世上难逢百岁人。力微休负重，言轻莫劝人。",
+      "无钱休入众，遭难莫寻亲。平生莫作皱眉事，世上应无切齿人。士者国之宝，儒为席上珍。",
+      "若要断酒法，醒眼看醉人。求人须求大丈夫，济人须济急时无。渴时一滴如甘露，醉后添杯不如无。"
+    ];
+
+    const builtinPracticalArticles = zengguangTexts.map((display, index) => {
+      const units = textToUnits(display);
+      return {
+        id: `zengguang-${index + 1}`,
+        title: `增广贤文 第${String(index + 1).padStart(2, "0")}则`,
+        display,
+        target: buildTargetFromUnits(units).toLowerCase(),
+        units,
+        collection: "practical",
+        practical: true,
+        builtin: true,
+        category: "增广贤文",
+        order: index
+      };
+    });
+
     const builtinLibrary = [
       ...fingerPracticeArticles,
       ...builtinArticles.filter(item => item.collection !== "caigentan"),
@@ -1202,6 +1296,7 @@
       { id: "tang300", title: `唐诗三百首${tangPoems.length ? `（${tangPoems.length}首）` : ""}` },
       { id: "caigentan", title: `菜根谭全集${caigentanItems.length ? `（${caigentanItems.length}则）` : ""}` },
       { id: "english", title: "英文 / 新概念" },
+      { id: "practical", title: "实战练习" },
       { id: "custom", title: "我的文章" }
     ];
 
@@ -1266,6 +1361,8 @@
     const editorBackdrop = document.getElementById("editorBackdrop");
     const articleForm = document.getElementById("articleForm");
     const articleTitleInput = document.getElementById("articleTitleInput");
+    const practicalCategoryField = document.getElementById("practicalCategoryField");
+    const practicalCategoryInput = document.getElementById("practicalCategoryInput");
     const articleDisplayInput = document.getElementById("articleDisplayInput");
     const articleTargetInput = document.getElementById("articleTargetInput");
     const autoPinyinBtn = document.getElementById("autoPinyinBtn");
@@ -1274,10 +1371,14 @@
     const lessonAuthorEl = document.getElementById("lessonAuthor");
 
     const storageKey = "typingHeroCustomArticles";
+    const practicalStorageKey = "typingHeroPracticalArticles";
     const hiddenCollectionsKey = "typingHeroHiddenCollections";
     const soundStorageKey = "typingHeroSoundEnabled";
     const handModeStorageKey = "typingHeroHandMode";
     let customArticles = loadCustomArticles();
+    let practicalArticles = loadPracticalArticles();
+    let pendingArticleMode = "custom";
+    let pendingPracticalCategory = "";
     let hiddenCollections = loadHiddenCollections();
     let currentCollection = "fingering";
     let articles = [];
@@ -1315,6 +1416,39 @@
         showToast("保存失败：文章太长，已超过浏览器本地存储容量。");
         return false;
       }
+    }
+
+    function loadPracticalArticles() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(practicalStorageKey) || "[]");
+        return Array.isArray(stored) ? stored.filter(item => item && item.title && item.display).map(normalizePracticalArticle) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function savePracticalArticles() {
+      try {
+        localStorage.setItem(practicalStorageKey, JSON.stringify(practicalArticles));
+        return true;
+      } catch {
+        showToast("保存失败：实战文章太长，已超过浏览器本地存储容量。");
+        return false;
+      }
+    }
+
+    function normalizePracticalArticle(article) {
+      const display = article.display || articleDisplayText(article);
+      const units = Array.isArray(article.units) ? article.units : textToUnits(display);
+      return {
+        ...article,
+        display,
+        units,
+        target: (article.target || buildTargetFromUnits(units)).toLowerCase(),
+        collection: "practical",
+        practical: true,
+        category: article.category || "我的实战"
+      };
     }
 
     function normalizeCustomArticle(article) {
@@ -1363,6 +1497,7 @@
       const visibleCollections = collections.filter(item => {
         if (item.fixed) return true;
         if (item.id === "custom") return customArticles.length > 0 || currentCollection === "custom";
+        if (item.id === "practical") return true;
         return !hiddenCollections.has(item.id);
       });
       collectionSelectEl.innerHTML = visibleCollections.map(item => `<option value="${item.id}">${item.title}</option>`).join("");
@@ -1371,20 +1506,25 @@
 
     function articlesForCollection(collectionId) {
       if (collectionId === "custom") return customArticles;
+      if (collectionId === "practical") return [...builtinPracticalArticles, ...practicalArticles];
       if (collectionId === "caigentan") return caigentanItems;
       if (collectionId === "tang300") return tangPoems;
       return builtinLibrary.filter(item => item.collection === collectionId);
     }
 
     function renderArticleOptions() {
-      if (currentCollection !== "tang300" && currentCollection !== "caigentan" && currentCollection !== "fingering") {
+      if (currentCollection === "practical" && !articles.length) {
+        articleSelectEl.innerHTML = `<option value="practical-empty">先添加或导入实战文章</option>`;
+        return;
+      }
+      if (currentCollection !== "tang300" && currentCollection !== "caigentan" && currentCollection !== "fingering" && currentCollection !== "practical") {
         articleSelectEl.innerHTML = articles.map(item => `<option value="${item.id}">${escapeHtml(articleLabel(item))}</option>`).join("");
         return;
       }
 
       const groups = new Map();
       articles.forEach(item => {
-        const key = item.category || "唐诗三百首";
+        const key = item.category || (currentCollection === "practical" ? "我的实战" : "唐诗三百首");
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key).push(item);
       });
@@ -1405,7 +1545,14 @@
         currentCollection = firstAvailableCollection();
         articles = articlesForCollection(currentCollection);
       }
-      currentArticle = articles.find(item => item.id === selectedId) || articles[0] || builtinLibrary[0];
+      currentArticle = articles.find(item => item.id === selectedId) || articles[0] || (currentCollection === "practical" ? {
+        id: "practical-empty",
+        title: "实战练习",
+        display: "",
+        target: "",
+        units: [],
+        collection: "practical"
+      } : builtinLibrary[0]);
       renderCollectionOptions();
       renderArticleOptions();
       articleSelectEl.value = currentArticle.id;
@@ -1416,7 +1563,7 @@
     }
 
     function firstAvailableCollection() {
-      const found = collections.find(item => item.id !== "custom" && (item.fixed || !hiddenCollections.has(item.id)) && articlesForCollection(item.id).length);
+      const found = collections.find(item => item.id !== "custom" && (item.fixed || !hiddenCollections.has(item.id) || item.id === "practical") && articlesForCollection(item.id).length);
       return found ? found.id : "custom";
     }
 
@@ -1433,6 +1580,19 @@
         deleteArticleBtn.title = customArticles.length > 1 ? "删除当前自定义文章；按住 Shift 点击可清空我的文章" : "删除当前自定义文章";
         return;
       }
+      if (currentCollection === "practical") {
+        const userPractical = practicalArticles.some(item => item.id === currentArticle.id);
+        if (!userPractical) {
+          deleteArticleBtn.disabled = true;
+          deleteArticleBtn.textContent = "固定内容";
+          deleteArticleBtn.title = "内置实战材料不能删除。";
+          return;
+        }
+        deleteArticleBtn.disabled = false;
+        deleteArticleBtn.textContent = practicalArticles.length > 1 ? "删除本文" : "删除";
+        deleteArticleBtn.title = practicalArticles.length > 1 ? "删除当前实战文章；按住 Shift 点击可清空实战练习" : "删除当前实战文章";
+        return;
+      }
       deleteArticleBtn.disabled = false;
       deleteArticleBtn.textContent = "删除栏目";
       deleteArticleBtn.title = "从界面隐藏当前栏目，不会删除程序文件";
@@ -1445,17 +1605,75 @@
 
     function renderPhrase() {
       if (!lesson.length) {
+        phraseEl.classList.remove("poem-phrase");
+        phraseEl.classList.remove("practical-phrase");
         phraseEl.innerHTML = `<div class="article-text" id="articleText"></div>`;
         renderTextArticle();
         return;
       }
 
-      phraseEl.innerHTML = lesson.map((item, index) => `
+      phraseEl.classList.toggle("poem-phrase", currentCollection === "tang300");
+      phraseEl.classList.toggle("practical-phrase", currentCollection === "practical");
+      const syllableHtml = (item, index) => `
         <span class="syllable ${isPunctuationUnit(item) ? "punct" : ""}" data-start="${startOf(index)}" data-end="${endOf(index)}">
           <span class="pinyin">${escapeHtml(item.show || item.py)}</span>
           <span class="hanzi">${escapeHtml(item.hz)}</span>
         </span>
-      `).join("");
+      `;
+      const practicalHtml = (item, index) => {
+        const start = startOf(index);
+        const end = endOf(index);
+        const state = position >= end ? "done" : position >= start && position < end ? "current" : "pending";
+        const activeClass = state === "current" ? "active" : "";
+        const text = practicalUnitInputText(item, start, end);
+        return `
+          <span class="syllable ${state} ${activeClass} ${isPunctuationUnit(item) ? "punct" : ""}" data-start="${start}" data-end="${end}">
+            <span class="pinyin">${escapeHtml(text || "·")}</span>
+            <span class="hanzi">${escapeHtml(item.hz)}</span>
+          </span>
+        `;
+      };
+
+      if (currentCollection === "tang300") {
+        phraseEl.innerHTML = poemLineGroups(lesson).map(group => `
+          <div class="poem-line">
+            ${group.map(index => syllableHtml(lesson[index], index)).join("")}
+          </div>
+        `).join("");
+        return;
+      }
+
+      if (currentCollection === "practical") {
+        phraseEl.innerHTML = lesson.map((item, index) => practicalHtml(item, index)).join("");
+        return;
+      }
+
+      phraseEl.innerHTML = lesson.map((item, index) => syllableHtml(item, index)).join("");
+    }
+
+    function practicalUnitInputText(item, start, end) {
+      if (position <= start) return "";
+      if (position >= end) return item.show || item.py;
+      return item.py.slice(0, Math.max(0, position - start));
+    }
+
+    function poemLineGroups(units) {
+      const groups = [];
+      let current = [];
+      let sentenceCount = 0;
+      units.forEach((item, index) => {
+        current.push(index);
+        if (item && /[，,。.!！?？；;]/.test(item.hz || item.py || "")) {
+          sentenceCount += 1;
+        }
+        if (sentenceCount >= 2) {
+          groups.push(current);
+          current = [];
+          sentenceCount = 0;
+        }
+      });
+      if (current.length) groups.push(current);
+      return groups;
     }
 
     function renderTextArticle() {
@@ -1481,7 +1699,7 @@
     }
 
     function isPunctuationChar(char) {
-      return /[，。！？、；：,.!?;:]/.test(char);
+      return /[，。！？、；：,.!?;:“”‘’"'《》〈〉（）()\[\]【】{}<>…—\-]/.test(char);
     }
 
     function isPunctuationUnit(item) {
@@ -1543,7 +1761,11 @@
     }
 
     function normalizePunctuation(char) {
-      const map = { "，": ",", "。": ".", "！": "!", "？": "?", "；": ";", "：": ":", "、": "," };
+      const map = {
+        "，": ",", "。": ".", "！": "!", "？": "?", "；": ";", "：": ":", "、": ",",
+        "“": "\"", "”": "\"", "‘": "'", "’": "'", "《": "<", "》": ">", "〈": "<", "〉": ">",
+        "（": "(", "）": ")", "【": "[", "】": "]", "—": "-", "…": "."
+      };
       return map[char] || char;
     }
 
@@ -1727,6 +1949,10 @@
         finger.classList.toggle("active", finger.dataset.finger === fingerMap[next] || isSpaceThumb);
       });
       syncHandPrompt(next);
+
+      if (currentCollection === "practical") {
+        renderPhrase();
+      }
 
       document.querySelectorAll(".syllable").forEach(item => {
         const start = Number(item.dataset.start);
@@ -1971,7 +2197,7 @@
 
     function showArticleToast(prefix = "已切换到") {
       const author = currentArticle.author ? ` / ${currentArticle.author}` : "";
-      const hint = isPagedCollection() ? "按 Enter 切换下一篇，空格也可切换。" : "按 Esc 可重新开始。";
+      const hint = isPagedCollection() ? "按 Enter 切换下一篇。" : "按 Esc 可重新开始。";
       showToast(`${prefix}《${currentArticle.title}${author}》。${hint}`);
     }
 
@@ -1988,10 +2214,19 @@
       showArticleToast("下一篇");
     }
 
+    function currentPracticalCategory() {
+      return currentArticle && currentArticle.category ? currentArticle.category : "我的实战";
+    }
+
     function openEditor() {
+      pendingArticleMode = currentCollection === "practical" ? "practical" : "custom";
+      pendingPracticalCategory = pendingArticleMode === "practical" ? currentPracticalCategory() : "";
       articleTitleInput.value = "";
+      practicalCategoryInput.value = pendingPracticalCategory;
+      practicalCategoryField.classList.toggle("open", pendingArticleMode === "practical");
       articleDisplayInput.value = "";
       articleTargetInput.value = "";
+      articleTargetInput.placeholder = pendingArticleMode === "practical" ? "实战练习会自动生成输入目标；也可在这里手动修正拼音或标点。" : "中文文章建议填写不带声调的拼音；英文文章可直接复制显示内容。";
       editorBackdrop.classList.add("open");
       editorBackdrop.setAttribute("aria-hidden", "false");
       articleTitleInput.focus();
@@ -2020,27 +2255,32 @@
       const display = articleDisplayInput.value.trim();
       const units = textToUnits(display);
       const typed = (articleTargetInput.value.trim() || buildTargetFromUnits(units)).toLowerCase();
+      pendingPracticalCategory = pendingArticleMode === "practical" ? (practicalCategoryInput.value.trim() || "我的实战") : "";
       if (!title || !display || !typed) {
         showToast("文章名称和显示内容都要填写。");
         return;
       }
 
       const article = {
-        id: `custom-${Date.now()}`,
+        id: `${pendingArticleMode}-${Date.now()}`,
         title,
         display,
         target: typed,
         units,
-        collection: "custom",
-        custom: true
+        collection: pendingArticleMode,
+        custom: pendingArticleMode === "custom",
+        practical: pendingArticleMode === "practical",
+        category: pendingArticleMode === "practical" ? pendingPracticalCategory : undefined
       };
-      customArticles.push(article);
-      if (!saveCustomArticles()) {
-        customArticles.pop();
+      const list = pendingArticleMode === "practical" ? practicalArticles : customArticles;
+      list.push(article);
+      const ok = pendingArticleMode === "practical" ? savePracticalArticles() : saveCustomArticles();
+      if (!ok) {
+        list.pop();
         return;
       }
       closeEditor();
-      refreshArticles(article.id, "custom");
+      refreshArticles(article.id, pendingArticleMode);
       reset();
       const missing = unknownPinyinCount(units);
       showToast(missing ? `已添加《${title}》，${missing} 个字需要手动确认拼音。` : `已添加《${title}》。`);
@@ -2052,6 +2292,8 @@
         showToast("请选择 txt 格式文件。");
         return;
       }
+      const importMode = currentCollection === "practical" ? "practical" : "custom";
+      const importCategory = importMode === "practical" ? currentPracticalCategory() : "";
       const reader = new FileReader();
       reader.onload = () => {
         const display = String(reader.result || "").replace(/^\uFEFF/, "").trim();
@@ -2060,6 +2302,33 @@
           return;
         }
         const title = file.name.replace(/\.[^.]+$/, "").slice(0, 24) || "导入文章";
+        if (importMode === "practical") {
+          const chunks = splitTextChunks(display, 1600);
+          const imported = chunks.map((chunk, index) => {
+            const units = textToUnits(chunk);
+            return {
+              id: `practical-${Date.now()}-${index}`,
+              title: chunks.length > 1 ? `${title} ${index + 1}` : title,
+              display: chunk,
+              target: buildTargetFromUnits(units).toLowerCase(),
+              units,
+              collection: "practical",
+              practical: true,
+              category: importCategory
+            };
+          });
+          practicalArticles.push(...imported);
+          if (!savePracticalArticles()) {
+            practicalArticles.splice(practicalArticles.length - imported.length, imported.length);
+            return;
+          }
+          refreshArticles(imported[0].id, "practical");
+          reset();
+          txtFileInput.value = "";
+          showToast(`已导入《${title}》到“${importCategory}”，共 ${imported.length} 篇实战练习。`);
+          return;
+        }
+
         if (isLargeEnglishText(display, file.name)) {
           const practiceText = extractEnglishPracticeText(display) || display;
           const chunks = splitTextChunks(practiceText);
@@ -2117,6 +2386,10 @@
         deleteCustomArticle(event && event.shiftKey);
         return;
       }
+      if (currentCollection === "practical") {
+        deletePracticalArticle(event && event.shiftKey);
+        return;
+      }
       hideCurrentCollection();
     }
 
@@ -2147,6 +2420,39 @@
       refreshArticles(next && next.id, customArticles.length ? "custom" : firstAvailableCollection());
       reset();
       showToast("已删除当前文章。");
+    }
+
+    function deletePracticalArticle(deleteAll = false) {
+      if (!practicalArticles.length) {
+        showToast("实战练习里没有可删除内容。");
+        return;
+      }
+      if (!deleteAll && !practicalArticles.some(item => item.id === currentArticle.id)) {
+        showToast("内置实战材料不能删除。");
+        return;
+      }
+
+      if (deleteAll || practicalArticles.length === 1) {
+        const ok = window.confirm(`确定删除“实战练习”中的 ${practicalArticles.length} 篇内容吗？`);
+        if (!ok) return;
+        practicalArticles = [];
+        savePracticalArticles();
+        refreshArticles(null, firstAvailableCollection());
+        reset();
+        showToast("已清空实战练习。");
+        return;
+      }
+
+      const ok = window.confirm(`确定删除《${currentArticle.title}》吗？按住 Shift 点击删除可清空实战练习。`);
+      if (!ok) return;
+      const deletedId = currentArticle.id;
+      const index = practicalArticles.findIndex(item => item.id === deletedId);
+      practicalArticles = practicalArticles.filter(item => item.id !== deletedId);
+      savePracticalArticles();
+      const next = practicalArticles[Math.min(index, practicalArticles.length - 1)];
+      refreshArticles(next && next.id, practicalArticles.length ? "practical" : firstAvailableCollection());
+      reset();
+      showToast("已删除当前实战文章。");
     }
 
     function hideCurrentCollection() {
@@ -2187,7 +2493,7 @@
         showToast("已暂停，点击继续后再输入。");
         return;
       }
-      if ((event.key === "Enter" || event.key === " ") && isPagedCollection()) {
+      if (event.key === "Enter" && isPagedCollection()) {
         event.preventDefault();
         selectNextArticle();
         return;

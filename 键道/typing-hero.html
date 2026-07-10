@@ -515,199 +515,82 @@
 
     .hands {
       position: absolute;
-      left: 50%;
-      top: 54px;
-      width: min(984px, calc(100vw - 64px));
-      height: 320px;
-      transform: translateX(-50%);
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       z-index: 3;
       opacity: 0;
-      mix-blend-mode: multiply;
       transition: opacity .16s ease;
     }
 
     .trainer.show-hands .hands {
-      opacity: .72;
+      opacity: .94;
     }
 
-    .trainer.hand-full.show-hands .hands {
-      opacity: .72;
-    }
-
-    .finger {
-      position: absolute;
-      width: 36px;
-      height: 46px;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
-      box-shadow: none;
-      transform-origin: 50% 0;
-      opacity: 0;
-      transition: left .14s ease, top .14s ease, border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease, background .12s ease;
-    }
-
-    .finger::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .78), rgba(117, 123, 132, .22) 62%, rgba(117, 123, 132, .12));
-      border: 2px solid rgba(112, 118, 126, .42);
-      box-shadow: 0 5px 13px rgba(80, 88, 100, .12);
-    }
-
-    .finger.left.little { left: 136px; top: 116px; transform: rotate(8deg); }
-    .finger.left.ring { left: 204px; top: 110px; transform: rotate(5deg); }
-    .finger.left.middle { left: 272px; top: 106px; transform: rotate(2deg); }
-    .finger.left.index { left: 340px; top: 112px; transform: rotate(-1deg); }
-    .finger.right.index { right: 402px; top: 112px; transform: rotate(1deg); }
-    .finger.right.middle { right: 337px; top: 106px; transform: rotate(-2deg); }
-    .finger.right.ring { right: 272px; top: 110px; transform: rotate(-5deg); }
-    .finger.right.little { right: 207px; top: 116px; transform: rotate(-8deg); }
-
+    .finger,
     .thumb {
       position: absolute;
-      top: 238px;
-      width: 84px;
-      height: 34px;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
-      opacity: 0;
-      transition: left .14s ease, top .14s ease, border-color .12s ease, transform .12s ease, opacity .12s ease, box-shadow .12s ease;
+      left: var(--base-x, 50%);
+      top: var(--base-y, 100%);
+      width: var(--finger-width, 18px);
+      height: var(--finger-length, 78px);
+      border: 1.5px solid rgba(104, 119, 138, .38);
+      border-top-color: rgba(104, 119, 138, .52);
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .05));
+      box-shadow: none;
+      transform: translate(-50%, -100%) rotate(var(--finger-angle, 0deg));
+      transform-origin: 50% 100%;
+      opacity: .5;
+      transition:
+        left .22s ease,
+        top .22s ease,
+        height .22s ease,
+        width .18s ease,
+        border-color .14s ease,
+        transform .22s ease,
+        opacity .14s ease,
+        box-shadow .14s ease,
+        background .14s ease;
     }
 
+    .thumb {
+      --finger-width: 22px;
+      border-style: dashed;
+    }
+
+    .finger::after,
     .thumb::after {
       content: "";
       position: absolute;
       left: 50%;
-      top: 50%;
-      width: 30px;
-      height: 30px;
+      top: 0;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .78), rgba(117, 123, 132, .22) 62%, rgba(117, 123, 132, .12));
-      border: 2px solid rgba(112, 118, 126, .42);
-      box-shadow: 0 5px 13px rgba(80, 88, 100, .12);
-    }
-
-    .thumb.left {
-      left: 365px;
-      transform: rotate(-9deg);
-    }
-
-    .thumb.right {
-      right: 365px;
-      transform: rotate(9deg);
-    }
-
-    .trainer:not(.hand-full) .finger,
-    .trainer:not(.hand-full) .thumb {
-      left: var(--home-x);
-      top: var(--home-y);
-      right: auto;
-      transform: translate(-50%, -50%);
-      opacity: .62;
+      background: rgba(104, 119, 138, .24);
+      border: 1.5px solid rgba(104, 119, 138, .42);
+      box-shadow: 0 0 0 3px rgba(104, 119, 138, .06);
     }
 
     .finger.active,
     .thumb.active {
-      opacity: 1;
-    }
-
-    .trainer:not(.hand-full) .finger.active,
-    .trainer:not(.hand-full) .thumb.active {
-      left: var(--press-x);
-      top: var(--press-y);
-      right: auto;
-      transform: translate(-50%, -50%);
-    }
-
-    .trainer.hand-full .finger {
-      width: 58px;
-      height: 230px;
-      border: 4px solid rgba(87, 95, 108, .46);
-      border-bottom-color: rgba(87, 95, 108, .22);
-      border-radius: 999px 999px 42px 42px;
-      background: rgba(255, 255, 255, .18);
-      opacity: .68;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .62), 0 8px 22px rgba(58, 66, 80, .08);
-    }
-
-    .trainer.hand-full .finger::after {
-      top: 18px;
-      width: 28px;
-      height: 28px;
-    }
-
-    .trainer.hand-full .thumb {
-      top: 228px;
-      width: 96px;
-      height: 92px;
-      border: 4px solid rgba(87, 95, 108, .4);
-      border-top-color: rgba(87, 95, 108, .18);
-      border-radius: 46px;
-      background: rgba(255, 255, 255, .18);
-      opacity: .6;
-    }
-
-    .trainer.hand-full .thumb::after {
-      top: 26px;
-      width: 30px;
-      height: 30px;
-    }
-
-    .trainer.hand-full .finger {
-      left: calc(var(--home-x) - 29px);
-      top: calc(var(--home-y) - 18px);
-      right: auto;
-      transform: none;
-    }
-
-    .trainer.hand-full .thumb.left {
-      left: calc(var(--home-x) - 48px);
-      top: calc(var(--home-y) - 26px);
-      transform: none;
-    }
-
-    .trainer.hand-full .thumb.right {
-      left: calc(var(--home-x) - 48px);
-      top: calc(var(--home-y) - 26px);
-      right: auto;
-      transform: none;
-    }
-
-    .trainer.hand-full .finger.active,
-    .trainer.hand-full .thumb.active {
-      opacity: .9;
-      border-color: rgba(52, 112, 220, .78);
-      background: rgba(111, 167, 242, .08);
-    }
-
-    .trainer.hand-full .finger.active {
-      left: calc(var(--press-x) - 29px);
-      top: calc(var(--press-y) - 18px);
-      transform: translateY(-4px);
-    }
-
-    .trainer.hand-full .thumb.active {
-      left: calc(var(--press-x) - 48px);
-      top: calc(var(--press-y) - 26px);
-      right: auto;
-      transform: translateY(-3px);
+      opacity: .96;
+      border-color: rgba(52, 112, 220, .68);
+      background: linear-gradient(180deg, rgba(96, 151, 235, .16), rgba(96, 151, 235, .05));
+      box-shadow: 0 8px 18px rgba(52, 112, 220, .1);
     }
 
     .finger.active::after,
     .thumb.active::after {
-      background: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .82), rgba(79, 142, 233, .38) 62%, rgba(79, 142, 233, .24));
-      border-color: rgba(52, 112, 220, .95);
-      box-shadow: 0 0 0 7px rgba(52, 112, 220, .12), 0 7px 18px rgba(52, 112, 220, .22);
+      width: 17px;
+      height: 17px;
+      background: radial-gradient(circle at 40% 35%, rgba(255, 255, 255, .9), rgba(79, 142, 233, .46) 60%, rgba(79, 142, 233, .24));
+      border-color: rgba(52, 112, 220, .78);
+      box-shadow: 0 0 0 6px rgba(52, 112, 220, .08), 0 6px 14px rgba(52, 112, 220, .14);
     }
 
     .toast {
@@ -1325,6 +1208,19 @@
       "right-thumb": " "
     };
 
+    const fingerPalmOffset = {
+      "left-little": { x: -82, y: 142 },
+      "left-ring": { x: -58, y: 150 },
+      "left-middle": { x: -34, y: 156 },
+      "left-index": { x: -8, y: 158 },
+      "left-thumb": { x: 36, y: 92 },
+      "right-thumb": { x: -36, y: 92 },
+      "right-index": { x: 8, y: 158 },
+      "right-middle": { x: 34, y: 156 },
+      "right-ring": { x: 58, y: 150 },
+      "right-little": { x: 82, y: 142 }
+    };
+
     const shiftedKeyMap = {
       "~": "`", "!": "1", "@": "2", "#": "3", "$": "4", "%": "5", "^": "6",
       "&": "7", "*": "8", "(": "9", ")": "0", "_": "-", "+": "=",
@@ -1334,6 +1230,35 @@
     Object.entries(shiftedKeyMap).forEach(([shifted, base]) => {
       fingerMap[shifted] = fingerMap[base];
     });
+
+    function baseKeyForInput(key) {
+      return shiftedKeyMap[key] || key;
+    }
+
+    function shiftKeyForInput(key) {
+      const base = shiftedKeyMap[key];
+      if (!base) return "";
+      const baseFinger = fingerMap[base] || "";
+      return baseFinger.startsWith("left-") ? "ShiftRight" : "ShiftLeft";
+    }
+
+    function shiftFingerForInput(key) {
+      const shiftKey = shiftKeyForInput(key);
+      if (shiftKey === "ShiftRight") return "right-little";
+      if (shiftKey === "ShiftLeft") return "left-little";
+      return "";
+    }
+
+    function expectedPhysicalKeys(key) {
+      if (!key) return [];
+      const base = baseKeyForInput(key);
+      const shift = shiftKeyForInput(key);
+      return shift ? [base, shift] : [base];
+    }
+
+    function matchesPhysicalKey(id, key) {
+      return id === key || matchesKey(id, key);
+    }
 
     const phraseEl = document.getElementById("phrase");
     const trainerEl = document.querySelector(".trainer");
@@ -1397,7 +1322,7 @@
     let pausedAt = 0;
     let pausedDuration = 0;
     let soundEnabled = localStorage.getItem(soundStorageKey) !== "off";
-    let handMode = localStorage.getItem(handModeStorageKey) === "full" ? "full" : "simple";
+    let handMode = localStorage.getItem(handModeStorageKey) === "off" ? "off" : "guide";
 
     function loadCustomArticles() {
       try {
@@ -1886,7 +1811,8 @@
 
     function keyLabel(key) {
       if (key === " ") return "空格";
-      if (shiftedKeyMap[key]) return `Shift + ${shiftedKeyMap[key]}`;
+      const shiftKey = shiftKeyForInput(key);
+      if (shiftKey) return `${shiftKey === "ShiftRight" ? "右Shift" : "左Shift"} + ${shiftedKeyMap[key]}`;
       return key;
     }
 
@@ -1920,17 +1846,17 @@
       pauseBtn.classList.toggle("active", paused);
       soundToggleBtn.textContent = soundEnabled ? "音效 开" : "音效 关";
       soundToggleBtn.classList.toggle("active", soundEnabled);
-      handModeBtn.textContent = handMode === "full" ? "整手" : "指尖";
-      handModeBtn.classList.toggle("active", handMode === "full");
+      handModeBtn.textContent = handMode === "off" ? "手指 关" : "手指 开";
+      handModeBtn.classList.toggle("active", handMode !== "off");
       fullscreenBtn.textContent = document.fullscreenElement ? "退出" : "全屏";
       fullscreenBtn.classList.toggle("active", Boolean(document.fullscreenElement));
       trainerEl.classList.toggle("paused", paused);
-      trainerEl.classList.toggle("hand-full", handMode === "full");
+      trainerEl.classList.toggle("hand-full", false);
     }
 
     function updateUi() {
       const next = nextChar();
-      trainerEl.classList.toggle("show-hands", currentCollection === "fingering");
+      trainerEl.classList.toggle("show-hands", currentCollection === "fingering" && handMode !== "off");
       updateControls();
       nextKeyEl.textContent = next ? keyLabel(next) : "完成";
       rightCountEl.textContent = right;
@@ -1941,12 +1867,13 @@
 
       document.querySelectorAll(".key").forEach(key => {
         key.classList.remove("next", "wrong");
-        if (matchesKey(key.dataset.key, next)) key.classList.add("next");
+        if (expectedPhysicalKeys(next).some(item => matchesPhysicalKey(key.dataset.key, item))) key.classList.add("next");
       });
 
+      const activeFingerNames = new Set([fingerMap[baseKeyForInput(next)], shiftFingerForInput(next)]);
       document.querySelectorAll("[data-finger]").forEach(finger => {
         const isSpaceThumb = next === " " && finger.dataset.finger.endsWith("-thumb");
-        finger.classList.toggle("active", finger.dataset.finger === fingerMap[next] || isSpaceThumb);
+        finger.classList.toggle("active", activeFingerNames.has(finger.dataset.finger) || isSpaceThumb);
       });
       syncHandPrompt(next);
 
@@ -1998,12 +1925,12 @@
       handsEl.style.left = `${keyboardRect.left - trainerRect.left}px`;
       handsEl.style.top = `${keyboardRect.top - trainerRect.top}px`;
       handsEl.style.width = `${keyboardRect.width}px`;
-      handsEl.style.height = `${keyboardRect.height}px`;
+      handsEl.style.height = `${keyboardRect.height + 170}px`;
       handsEl.style.transform = "none";
 
       const keys = Array.from(keyboardEl.querySelectorAll(".key"));
       const keyCenter = (keyValue, fingerName = "") => {
-        const item = keys.find(keyItem => matchesKey(keyItem.dataset.key, keyValue));
+        const item = keys.find(keyItem => matchesPhysicalKey(keyItem.dataset.key, keyValue));
         if (!item) return null;
         const rect = item.getBoundingClientRect();
         let x = rect.left - keyboardRect.left + rect.width / 2;
@@ -2015,21 +1942,51 @@
         };
       };
 
+      const applyFingerVector = (finger, base, tip) => {
+        const dx = tip.x - base.x;
+        const dy = tip.y - base.y;
+        const length = Math.max(46, Math.hypot(dx, dy));
+        const angle = Math.atan2(dx, -dy) * 180 / Math.PI;
+        finger.style.setProperty("--base-x", `${base.x}px`);
+        finger.style.setProperty("--base-y", `${base.y}px`);
+        finger.style.setProperty("--finger-length", `${length}px`);
+        finger.style.setProperty("--finger-angle", `${angle}deg`);
+      };
+
       document.querySelectorAll("[data-finger]").forEach(finger => {
         const home = keyCenter(homeKeyMap[finger.dataset.finger], finger.dataset.finger);
         if (!home) return;
-        finger.style.setProperty("--home-x", `${home.x}px`);
-        finger.style.setProperty("--home-y", `${home.y}px`);
+        const offset = fingerPalmOffset[finger.dataset.finger] || { x: 0, y: 126 };
+        const base = {
+          x: home.x + offset.x,
+          y: Math.min(keyboardRect.height + 154, home.y + offset.y)
+        };
+        applyFingerVector(finger, base, home);
       });
 
-      const targetKey = keys.find(item => matchesKey(item.dataset.key, key));
-      if (!targetKey) return;
+      const targetPairs = [{
+        fingerName: key === " " ? "right-thumb" : fingerMap[baseKeyForInput(key)],
+        keyValue: baseKeyForInput(key)
+      }];
+      const shiftFingerName = shiftFingerForInput(key);
+      const shiftKeyValue = shiftKeyForInput(key);
+      if (shiftFingerName && shiftKeyValue) {
+        targetPairs.push({ fingerName: shiftFingerName, keyValue: shiftKeyValue });
+      }
 
-      document.querySelectorAll("[data-finger]").forEach(finger => {
-        const press = keyCenter(key, finger.dataset.finger);
-        if (!press) return;
-        finger.style.setProperty("--press-x", `${press.x}px`);
-        finger.style.setProperty("--press-y", `${press.y}px`);
+      targetPairs.forEach(({ fingerName, keyValue }) => {
+        if (!fingerName || !keyValue) return;
+        const finger = document.querySelector(`[data-finger="${fingerName}"]`);
+        if (!finger) return;
+        const home = keyCenter(homeKeyMap[finger.dataset.finger], finger.dataset.finger);
+        const press = keyCenter(keyValue, finger.dataset.finger);
+        if (!home || !press) return;
+        const offset = fingerPalmOffset[finger.dataset.finger] || { x: 0, y: 126 };
+        const base = {
+          x: home.x + offset.x,
+          y: Math.min(keyboardRect.height + 154, home.y + offset.y)
+        };
+        applyFingerVector(finger, base, press);
       });
     }
 
@@ -2111,10 +2068,13 @@
     }
 
     function markPressed(key, ok) {
-      const targetKey = [...document.querySelectorAll(".key")].find(item => matchesKey(item.dataset.key, key));
-      if (!targetKey) return;
-      targetKey.classList.add(ok ? "pressed" : "wrong");
-      window.setTimeout(() => targetKey.classList.remove("pressed", "wrong"), ok ? 220 : 180);
+      const targetKeys = [...document.querySelectorAll(".key")]
+        .filter(item => expectedPhysicalKeys(key).some(expected => matchesPhysicalKey(item.dataset.key, expected)));
+      if (!targetKeys.length) return;
+      targetKeys.forEach(targetKey => {
+        targetKey.classList.add(ok ? "pressed" : "wrong");
+        window.setTimeout(() => targetKey.classList.remove("pressed", "wrong"), ok ? 220 : 180);
+      });
     }
 
     function showToast(text, duration = 1800) {
@@ -2167,10 +2127,10 @@
     }
 
     function toggleHandMode() {
-      handMode = handMode === "full" ? "simple" : "full";
+      handMode = handMode === "off" ? "guide" : "off";
       localStorage.setItem(handModeStorageKey, handMode);
       updateUi();
-      showToast(handMode === "full" ? "已切换为整手提示。" : "已切换为指尖提示。");
+      showToast(handMode === "off" ? "已关闭手指指导。" : "已开启手指指导。");
       inputEl.focus();
     }
 
@@ -2505,6 +2465,7 @@
         clickSound(false);
         return;
       }
+      if (event.key === "Shift") return;
 
       const typed = normalizeKey(event);
       if (typed.length !== 1 || !target.length) return;

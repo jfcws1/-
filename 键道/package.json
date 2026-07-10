@@ -6,12 +6,43 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "web": "powershell -NoProfile -ExecutionPolicy Bypass -File start-typing-hero.ps1"
+    "web": "powershell -NoProfile -ExecutionPolicy Bypass -File start-typing-hero.ps1",
+    "dist": "electron-builder --win nsis"
   },
   "devDependencies": {
-    "electron": "^37.0.0"
+    "electron": "^37.0.0",
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "pinyin-pro": "^3.28.1"
+  },
+  "build": {
+    "appId": "com.jfcws.jiandao",
+    "productName": "键道",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "typing-hero.html",
+      "tang300-data.js",
+      "caigentan-data.js",
+      "pinyin-pro.js",
+      "icons/**/*",
+      "README.md"
+    ],
+    "win": {
+      "icon": "icons/jiandao-icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "键道"
+    }
   }
 }
